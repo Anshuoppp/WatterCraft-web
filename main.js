@@ -1,270 +1,263 @@
 /* ============================================================
-   WATTERCRAFT OFFICIAL — LOGIC + 3D WATER ANIMATION
+   WATTERCRAFT OFFICIAL — LOGIC V2
+   Video hero + Store checkout (UPI connect) + saare sections
+   data.js (V2) se khud bhar jaate hain.
    ============================================================ */
 (function () {
   "use strict";
-  const D = window.WC;                 // data.js se data
-  if (!D) { console.error("data.js missing!"); return; }
+  const D = window.WC;
+  if (!D) { console.error("data.js (V2) missing!"); return; }
 
-  /* ---------- Helpers ---------- */
   const $ = (s) => document.querySelector(s);
-  const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
+  const $$ = (s) => document.querySelectorAll(s);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-  /* small CSS fixes (anchor offset + hero fallback) */
-  const st = document.createElement("style");
-  st.textContent = "section{scroll-margin-top:80px}" +
-    ".hero{background:radial-gradient(1200px 600px at 70% -10%,#123a6b,#050d1a 60%)}" +
-    ".staff-avatar{background-size:cover;background-position:center}";
-  document.head.appendChild(st);
+  /* ================= HERO: asli gameplay video ================= */
+  const H = D.hero || {};
+  const v = $("#heroVideo");
+  if (v) {
+    if (H.video) {
+      const src = document.createElement("source");
+      src.src = H.video; src.type = "video/mp4";
+      v.appendChild(src);
+      if (H.poster) v.poster = H.poster;
+      v.addEventListener("canplay", () => v.classList.add("ready"), { once: true });
+      v.addEventListener("error", () => { /* fallback gradient bg hi rahega */ }, true);
+      v.load();
+    } else if (H.poster) {
+      v.style.background = `url('${H.poster}') center/cover no-repeat`;
+      v.classList.add("ready");
+    }
+  }
+  if ($("#heroBadge") && H.badge) $("#heroBadge").textContent = H.badge;
 
-  /* ---------- Server info fill ---------- */
-  const S = D.server;
-  if ($("#heroTagline"))  $("#heroTagline").textContent  = S.tagline;
-  if ($("#ipText"))       $("#ipText").textContent       = S.ip;
-  if ($("#joinIp"))       $("#joinIp").textContent       = S.ip;
-  if ($("#joinPort"))     $("#joinPort").textContent     = S.port;
-  if ($("#joinVersions")) $("#joinVersions").textContent = S.versions;
+  /* ================= SERVER INFO ================= */
+  const S = D.server || {};
+  if (S.tagline && $("#heroTagline")) $("#heroTagline").textContent = S.tagline;
+  if (S.ip && $("#ipText")) $("#ipText").textContent = S.ip;
+  if (S.ip && $("#joinIp")) $("#joinIp").textContent = S.ip;
+  if (S.port && $("#joinPort")) $("#joinPort").textContent = S.port;
+  if (S.versions && $("#joinVersions")) $("#joinVersions").textContent = S.versions;
+  if (S.discord) {
+    if ($("#navDiscord")) $("#navDiscord").href = S.discord;
+    if ($("#discordBtn")) $("#discordBtn").href = S.discord;
+  }
+  if (S.owner) {
+    if ($("#staffOwner")) $("#staffOwner").textContent = S.owner;
+    if ($("#footerOwner")) $("#footerOwner").textContent = S.owner;
+  }
+  const dc = D.discord || {};
+  if (dc.title && $("#discordTitle")) $("#discordTitle").textContent = dc.title;
+  if (dc.desc && $("#discordDesc")) $("#discordDesc").textContent = dc.desc;
 
-  /* ---------- Store ---------- */
-  if (D.store) {
-    const btn = $("#storeBtn");
-    if (btn) { btn.href = D.store.url; if (!D.store.enabled) btn.textContent = "⏳ Store Coming Soon"; }
-    const note = $("#storeNote");
-    if (note && D.store.note) note.textContent = D.store.note;
+  /* ================= STATS ================= */
+  const statsRow = $("#statsRow");
+  if (statsRow && D.stats) {
+    statsRow.innerHTML = D.stats.map((s, i) =>
+      `<div class="stat-item reveal">
+         <div class="stat-value">${esc(s.value)}</div>
+         <div class="stat-label">${esc(s.label)}</div>
+       </div>`).join("");
   }
 
-  /* ---------- Rank / Gem cards ---------- */
-  const rankIco = (n) => (/king/i.test(n) ? "👑" : /mvp/i.test(n) ? "💎" : /vip/i.test(n) ? "🟢" : "⭐");
+  /* ================= GAMEMODES ================= */
+  const modesGrid = $("#modesGrid");
+  if (modesGrid && D.gamemodes) {
+    modesGrid.innerHTML = D.gamemodes.map((m, i) => `
+      <article class="mode-card reveal" style="transition-delay:${i * 60}ms">
+        <div class="mode-media">
+          <img src="${esc(m.poster || "")}" alt="${esc(m.title)}" loading="lazy"
+               onerror="this.style.display='none'">
+        </div>
+        <div class="mode-shade"></div>
+        <div class="mode-icon">${esc(m.icon || "")}</div>
+        ${m.tag ? `<span class="mode-tag">${esc(m.tag)}</span>` : ""}
+        <div class="mode-body">
+          <h3>${esc(m.title)}</h3>
+          <p>${esc(m.desc)}</p>
+        </div>
+      </article>`).join("");
+  }
 
-  if ($("#gemsGrid") && D.gems) {
-    $("#gemsGrid").innerHTML = D.gems.map((g, i) => `
-      <div class="gem-card reveal">
-        <div class="gem-ico">💎</div><h4>${esc(g.name)}</h4>
-        <div class="gem-price">₹${esc(g.price)}</div>
-        <button class="btn btn-primary btn-sm buy-btn" style="margin-top:12px;width:100%" onclick="window.open('${esc(D.store.url)}','_blank')">Buy Now</button>
+  /* ================= STORE (UPI CONNECT) ================= */
+  const ST = D.store || {};
+  const API = ST.api || (S.storeUrl || "");
+
+  const stepsEl = $("#storeSteps");
+  if (stepsEl && ST.steps) {
+    stepsEl.innerHTML = ST.steps.map((st, i) =>
+      `<div class="store-step"><b>${i + 1}</b><span>${esc(st)}</span></div>`).join("");
+  }
+  if ($("#storeNote") && ST.note) $("#storeNote").textContent = ST.note;
+
+  const grid = $("#storeGrid");
+  if (grid && ST.packages) {
+    grid.innerHTML = ST.packages.map((p, i) => `
+      <div class="store-card ${p.featured ? "featured" : ""} reveal" style="--rc:${esc(p.color)};transition-delay:${i * 60}ms">
+        ${p.tag ? `<span class="store-tag">${esc(p.tag)}</span>` : ""}
+        <div class="store-icon">${esc(p.icon || "")}</div>
+        <h3 style="color:${esc(p.color)}">${esc(p.name)}</h3>
+        <div class="store-price">₹${esc(p.price)}<small> one-time</small></div>
+        <ul>${(p.perks || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+        <button class="btn btn-primary buy-btn" onclick="buyNow('${esc(p.id)}')">Buy ${esc(p.name)}</button>
       </div>`).join("");
   }
 
-  if ($("#ranksGrid") && D.ranks) {
-    $("#ranksGrid").innerHTML = D.ranks.map((r, i) => `
-      <div class="rank-card reveal" style="--rc:${esc(r.color)}">
-        <div class="rank-ico">${rankIco(r.name)}</div>
-        <h3>${esc(r.name)}</h3>
-        <div class="rank-price">₹${esc(r.price)}</div>
-        <ul class="perks">${r.perks.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>
-        <button class="btn btn-primary buy-btn" onclick="window.open('${esc(D.store.url)}','_blank')">Buy ${esc(r.name)}</button>
-      </div>`).join("");
-  }
-
-  /* ---------- Staff ---------- */
-  const roleColor = (r) => {
-    const m = { "owner": "#fbbf24", "co-owner": "#fb923c", "admin": "#f87171",
-                "sr.mod": "#4ade80", "mod": "#22d3ee", "helper": "#818cf8" };
-    for (const k in m) if (r.toLowerCase().includes(k)) return m[k];
-    return "#22d3ee";
+  /* --- Store modal flow --- */
+  let currentPkg = null;
+  window.buyNow = function (id) {
+    const p = (ST.packages || []).find((x) => x.id === id);
+    if (!p) return;
+    currentPkg = p;
+    $("#modalPkgInfo").innerHTML =
+      `<span>${esc(p.name)}</span><b>₹${esc(p.price)}</b>`;
+    $("#modalStatus").textContent = "";
+    $("#buyEmail").value = "";
+    $("#storeModal").classList.add("open");
+    setTimeout(() => $("#buyName").focus(), 100);
   };
 
-  if ($("#staffGrid") && D.staff) {
-    $("#staffGrid").innerHTML = D.staff.map((m, i) => {
-      const c = roleColor(m.rank);
-      const letter = esc((m.name || "?").charAt(0).toUpperCase());
-      const avatarStyle = m.skin
-        ? `style="background-image:url('${esc(m.skin)}');color:transparent"`
-        : `style="--rc:${c}"`;
+  window.closeStoreModal = function () { $("#storeModal").classList.remove("open"); };
+
+  window.startCheckout = async function () {
+    const status = $("#modalStatus");
+    const name = $("#buyName").value.trim();
+    const email = $("#buyEmail").value.trim();
+    if (!currentPkg) return;
+    if (!name) { status.textContent = "⚠️ Apna Minecraft username daalo."; return; }
+    if (!API) { status.textContent = "⚠️ Worker API URL data.js me set nahi hai."; return; }
+
+    const btn = $("#modalConfirm");
+    btn.disabled = true;
+    status.textContent = "⏳ Payment link bana rahe hain...";
+
+    try {
+      const res = await fetch(API + "/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ packageId: currentPkg.id, player: name, email: email || undefined }),
+      });
+      const data = await res.json();
+      if (data.ok && data.paymentUrl) {
+        window.location.href = data.paymentUrl;   // Razorpay UPI page
+      } else {
+        status.textContent = "❌ Error: " + (data.error || "unknown") + ". Discord pe report karo.";
+        btn.disabled = false;
+      }
+    } catch (e) {
+      status.textContent = "❌ Network error — Worker URL check karo.";
+      btn.disabled = false;
+    }
+  };
+
+  /* ================= STAFF ================= */
+  const roleColor = (r) => {
+    const m = { "owner": "#fbbf24", "co-owner": "#fb923c", "admin": "#f87171",
+                "sr.mod": "#4ade80", "mod": "#22d3ee", "helper": "#a78bfa", "trial": "#94a3b8" };
+    const k = String(r || "").toLowerCase();
+    return m[k] || "#22d3ee";
+  };
+  const avatarFor = (st) => {
+    if (st.avatar) return `background-image:url('${esc(st.avatar)}')`;
+    if (st.skin)  return `background-image:url('https://mc-heads.net/avatar/${encodeURIComponent(st.skin)}/160')`;
+    return "";
+  };
+  const initials = (n) => String(n || "?").slice(0, 2).toUpperCase();
+
+  const staffGrid = $("#staffGrid");
+  if (staffGrid && D.staff) {
+    staffGrid.innerHTML = D.staff.map((st, i) => {
+      const bg = avatarFor(st);
+      const color = roleColor(st.rank);
       return `
-      <div class="staff-card reveal" style="--rc:${c}">
-        <div class="staff-avatar" ${avatarStyle}>${m.skin ? "" : letter}</div>
-        <h4>${esc(m.name)}</h4>
-        <span class="staff-role">${esc(m.rank)}</span>
-        <div class="staff-disc">💬 ${esc(m.discord || "—")}</div>
+      <div class="staff-card reveal" style="transition-delay:${i * 50}ms">
+        <div class="staff-avatar" style="${bg}">${bg ? "" : `<span class="initials">${esc(initials(st.name))}</span>`}</div>
+        <h4>${esc(st.name)}</h4>
+        <span class="staff-role" style="color:${color};border-color:${color}55;background:${color}14">${esc(st.rank)}</span>
+        ${st.discord ? `<div class="staff-discord">Discord: ${esc(st.discord)}</div>` : ""}
       </div>`;
     }).join("");
   }
 
-  /* ---------- News ---------- */
-  if ($("#newsList") && D.news) {
-    $("#newsList").innerHTML = D.news.map((n, i) => `
-      <div class="news-item reveal">
-        <div class="news-meta"><span class="news-tag">${esc(n.tag || "UPDATE")}</span>
-        <span class="news-date">📅 ${esc(n.date)}</span></div>
-        <h4>${esc(n.title)}</h4><p>${esc(n.text)}</p>
-      </div>`).join("");
+  /* ================= NEWS ================= */
+  const newsList = $("#newsList");
+  if (newsList && D.news) {
+    newsList.innerHTML = D.news.map((n, i) => `
+      <article class="news-item reveal" style="transition-delay:${i * 70}ms">
+        <div class="news-meta">
+          <span class="news-date">${esc(n.date)}</span>
+          ${n.tag ? `<span class="news-tag">${esc(n.tag)}</span>` : ""}
+        </div>
+        <div class="news-body">
+          <h4>${esc(n.title)}</h4>
+          <p>${esc(n.text)}</p>
+        </div>
+      </article>`).join("");
   }
 
-  /* ---------- Vote ---------- */
-  if ($("#voteBtns") && S.vote && S.vote.length) {
-    $("#voteBtns").innerHTML = S.vote.map((v, i) =>
-      `<a class="vote-btn reveal" href="${esc(v.url)}" target="_blank" rel="noopener">🗳️ ${esc(v.name)}</a>`).join("");
+  /* ================= VOTE ================= */
+  const voteRow = $("#voteRow");
+  if (voteRow && D.vote) {
+    voteRow.innerHTML = D.vote.map((v) =>
+      `<a class="vote-btn" href="${esc(v.url)}" target="_blank" rel="noopener">⬆ Vote on ${esc(v.name)}</a>`).join("");
+  }
+  if ($("#voteRewards") && D.voteRewards) $("#voteRewards").textContent = D.voteRewards;
+
+  /* ================= RULES ================= */
+  const rulesList = $("#rulesList");
+  if (rulesList && D.rules) {
+    rulesList.innerHTML = D.rules.map((r) => `<li>${esc(r)}</li>`).join("");
   }
 
-  /* ---------- Rules ---------- */
-  if ($("#rulesList") && D.rules) {
-    $("#rulesList").innerHTML = D.rules.map((r, i) => `<li>${esc(r)}</li>`).join("");
-  }
-
-  /* ---------- Discord ---------- */
-  const dBtn = $("#discordBtn");
-  if (dBtn && S.discord) dBtn.href = S.discord;
-  const dh = $("#discordHeading"), dt = $("#discordText");
-  if (D.discordInfo) {
-    if (dh && D.discordInfo.heading) dh.textContent = D.discordInfo.heading;
-    if (dt && D.discordInfo.text) dt.textContent = D.discordInfo.text;
-  }
-
-  /* ---------- Copy IP + Modal ---------- */
+  /* ================= COPY IP ================= */
   window.copyIP = function () {
-    const ip = S.ip;
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(ip).then(() => showModal());
-    } else {
-      const ta = document.createElement("textarea");
-      ta.value = ip; document.body.appendChild(ta); ta.select();
-      document.execCommand("copy"); ta.remove(); showModal();
-    }
+    const ip = (S.ip || "").trim();
+    if (!ip) return;
+    const done = () => {
+      const c = $(".ip-copy");
+      if (c) { const old = c.textContent; c.textContent = "Copied!"; setTimeout(() => (c.textContent = old), 1600); }
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(ip).then(done).catch(() => fallback(ip, done));
+    } else fallback(ip, done);
   };
-  function showModal() {
-    const m = $("#ipModal");
-    const mi = $("#modalIp"); if (mi) mi.textContent = S.ip;
-    if (m) m.classList.add("active");
+  function fallback(ip, done) {
+    const ta = document.createElement("textarea");
+    ta.value = ip; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); done(); } catch (e) {}
+    document.body.removeChild(ta);
   }
-  window.closeModal = function () { const m = $("#ipModal"); if (m) m.classList.remove("active"); };
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+  window.closeJoinModal = function () { $("#joinModal").classList.remove("open"); };
 
-  /* ---------- Navbar ---------- */
-  const nav = $("#navbar"), links = $("#navLinks"), burger = $("#hamburger");
-  window.addEventListener("scroll", () => {
-    if (nav) nav.classList.toggle("scrolled", window.scrollY > 40);
-  });
+  /* ================= NAVBAR ================= */
+  const nav = $("#navbar");
+  const onScroll = () => nav && nav.classList.toggle("scrolled", window.scrollY > 40);
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  const burger = $("#hamburger");
+  const links = $("#navLinks");
   if (burger && links) {
-    burger.addEventListener("click", () => links.classList.toggle("open"));
-    links.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => links.classList.remove("open")));
-  }
-
-  /* ---------- Scroll Reveal ---------- */
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("visible"); io.unobserve(e.target); } });
-  }, { threshold: 0.12 });
-  document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
-
-  /* ============================================================
-     3D WATER + FLOATING ISLAND (Three.js)
-     ============================================================ */
-  const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const canvas = $("#hero3d");
-  const hasWebGL = (() => { try { const c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl") || c.getContext("experimental-webgl"))); } catch (e) { return false; } })();
-
-  if (canvas && hasWebGL && !reduced && window.THREE) {
-    try {
-      const scene = new THREE.Scene();
-      scene.fog = new THREE.Fog(0x0a1628, 18, 60);
-
-      const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 200);
-      camera.position.set(0, 6, 18);
-      camera.lookAt(0, 1, 0);
-
-      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-      /* lights */
-      scene.add(new THREE.HemisphereLight(0x88ccff, 0x0a1a33, 0.9));
-      const sun = new THREE.DirectionalLight(0xfff5d0, 1.2); sun.position.set(10, 20, 8); scene.add(sun);
-
-      /* moon / sun glow */
-      const glow = new THREE.Mesh(
-        new THREE.SphereGeometry(3, 16, 16),
-        new THREE.MeshBasicMaterial({ color: 0xbfdbfe, fog: false })
-      );
-      glow.position.set(-18, 14, -24); scene.add(glow);
-
-      /* ---- floating minecraft-style island ---- */
-      const island = new THREE.Group();
-      const mat = (c) => new THREE.MeshLambertMaterial({ color: c });
-      const box = (w, h, d, c, x, y, z) => {
-        const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(c));
-        m.position.set(x, y, z); island.add(m); return m;
-      };
-      /* grass top + dirt core (stepped like a skyblock island) */
-      box(6, 1, 6, 0x7bd65a, 0, 0.5, 0);
-      box(5, 1.4, 5, 0x8a5a2b, 0, -0.7, 0);
-      box(4, 1.6, 4, 0x6b4423, 0, -2, 0);
-      box(3, 1.6, 3, 0x8a5a2b, 0, -3.4, 0);
-      box(1.5, 1.8, 1.5, 0x5c3a1e, 0, -5, 0);
-      /* tree */
-      box(0.8, 2.2, 0.8, 0x6b4423, 1.6, 1.6, 1);
-      box(1.8, 1.8, 1.8, 0x2f9e44, 1.6, 3.2, 1);
-      box(0.8, 0.8, 0.8, 0x2f9e44, 1.6, 4.2, 1);
-      /* crystal */
-      const gem = new THREE.Mesh(
-        new THREE.OctahedronGeometry(0.8),
-        new THREE.MeshStandardMaterial({ color: 0x22d3ee, emissive: 0x0891b2, emissiveIntensity: 0.9 })
-      );
-      gem.position.set(-2, 2.4, -1.5); island.add(gem);
-      scene.add(island);
-
-      /* ---- water plane ---- */
-      const geo = new THREE.PlaneGeometry(90, 90, 70, 70);
-      geo.rotateX(-Math.PI / 2);
-      const water = new THREE.Mesh(geo, new THREE.MeshPhongMaterial({
-        color: 0x0e5a8a, transparent: true, opacity: 0.82,
-        shininess: 90, specular: 0x66ccff
+    burger.addEventListener("click", () => {
+      burger.classList.toggle("open");
+      links.classList.toggle("open");
+    });
+    links.querySelectorAll("a,button").forEach((el) =>
+      el.addEventListener("click", () => {
+        burger.classList.remove("open"); links.classList.remove("open");
       }));
-      water.position.y = -7.2; scene.add(water);
-
-      /* particles (bubbles) */
-      const parts = new THREE.Points(
-        new THREE.BufferGeometry(),
-        new THREE.PointsMaterial({ color: 0x88ddff, size: 0.08, transparent: true, opacity: 0.6 })
-      );
-      const pos = [];
-      for (let i = 0; i < 350; i++) pos.push((Math.random() - 0.5) * 60, Math.random() * 18 - 6, (Math.random() - 0.5) * 60);
-      parts.geometry.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
-      scene.add(parts);
-
-      /* ---- animate ---- */
-      let t = 0, mx = 0, my = 0;
-      window.addEventListener("mousemove", (e) => {
-        mx = (e.clientX / innerWidth - 0.5) * 2;
-        my = (e.clientY / innerHeight - 0.5) * 2;
-      }, { passive: true });
-
-      const tick = () => {
-        t += 0.016;
-        /* waves */
-        const p = water.geometry.attributes.position;
-        for (let i = 0; i < p.count; i++) {
-          const x = p.getX(i), z = p.getZ(i);
-          p.setY(i, Math.sin(x * 0.28 + t * 1.4) * 0.55 + Math.cos(z * 0.33 + t * 1.1) * 0.55);
-        }
-        p.needsUpdate = true;
-        water.geometry.computeVertexNormals();
-
-        island.position.y = Math.sin(t * 0.8) * 0.35;
-        island.rotation.y = t * 0.1;
-        gem.rotation.y = t * 1.5;
-        gem.position.y = 2.4 + Math.sin(t * 2) * 0.25;
-
-        camera.position.x += (mx * 1.6 - camera.position.x) * 0.02;
-        camera.position.y += (6 - my * 0.8 - camera.position.y) * 0.02;
-        camera.lookAt(0, 1, 0);
-
-        renderer.render(scene, camera);
-        requestAnimationFrame(tick);
-      };
-
-      const resize = () => {
-        const w = canvas.clientWidth || innerWidth, h = canvas.clientHeight || innerHeight;
-        renderer.setSize(w, h, false);
-        camera.aspect = w / h; camera.updateProjectionMatrix();
-      };
-      window.addEventListener("resize", resize);
-      resize();
-      tick();
-    } catch (err) {
-      console.warn("3D disabled:", err);
-    }
-  } else if (canvas) {
-    canvas.style.display = "none";   /* hero gradient fallback already in CSS */
   }
+
+  /* ================= REVEAL ON SCROLL ================= */
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  $$(".reveal").forEach((el) => io.observe(el));
+
+  /* ================= FOOTER YEAR ================= */
+  const y = $("#year");
+  if (y) y.textContent = new Date().getFullYear();
+
+  console.log("WatterCraft V2 loaded ✔");
 })();
-                 
