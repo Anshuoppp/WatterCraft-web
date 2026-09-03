@@ -1,237 +1,211 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WatterCraft Official | Bedrock Skyblock Server</title>
-  <meta name="description" content="WatterCraft — India's most cinematic Bedrock Skyblock server. Join play.wattercraft.fun:19132. UPI store with instant in-game delivery." />
-  <meta name="theme-color" content="#030812" />
-  <link rel="icon" type="image/png" href="assets/mark.png" />
+/**
+ * WatterCraft — Website Configuration
+ * All site content lives here. Edit values, not markup.
+ * Store package IDs must match the Cloudflare Worker (PACKAGES).
+ */
+window.WC = {
+  meta: {
+    name: "WatterCraft",
+    logo: "assets/logo.png",
+    mark: "assets/mark.png",
+    description:
+      "WatterCraft — India's most advanced Bedrock Skyblock server. Custom bosses, minions, deep mining and a UPI store with instant in-game delivery.",
+  },
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  server: {
+    name: "WatterCraft",
+    ip: "play.wattercraft.fun",
+    port: 19132,
+    platform: "Bedrock Edition",
+    region: "India",
+    owner: "Anshhu07",
+    ownerDiscord: "Anshhu07",
+    discord: "https://discord.gg/WATTERCRAFT", // TODO: replace with your invite
+    /* Used by the live player-count widget. Set to null to disable. */
+    statusHost: "play.wattercraft.fun",
+  },
 
-  <!-- Design (Part 3) -->
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
+  hero: {
+    background: "assets/lobby.png", // cinematic background
+    islandFrame: "assets/island.jpg", // floating preview frame
+    kicker: "BEDROCK SKYBLOCK · 24/7 · INDIA",
+    taglines: [
+      "Survive. Build. Dominate the Skies.",
+      "Hypixel-style Skyblock on Bedrock.",
+      "Custom Bosses · Minions · Real Economy.",
+    ],
+  },
 
-  <!-- ══════════ PRELOADER (cinematic intro) ══════════ -->
-  <div class="loader" id="loader">
-    <div class="loader-inner">
-      <div class="loader-mark"><img src="assets/mark.png" alt="W" /></div>
-      <div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div>
-      <div class="loader-text" id="loaderText">LOADING WATTERCRAFT</div>
-      <div class="loader-sub" id="loaderSub">Survive. Build. Dominate the Skies.</div>
-    </div>
-  </div>
+  ticker: [
+    "Skyblock",
+    "Custom Bosses",
+    "Minion System",
+    "Deep Mining",
+    "UPI Store",
+    "24/7 Uptime",
+    "Bedrock 1.20+",
+    "Made in India",
+  ],
 
-  <!-- ══════════ NAVBAR ══════════ -->
-  <header class="nav" id="navbar">
-    <div class="nav-inner">
-      <a href="#home" class="logo">
-        <span class="logo-ico">🌊</span>
-        <span class="logo-text">Watter<em>Craft</em></span>
-      </a>
-      <nav class="nav-links" id="navLinks">
-        <a href="#home">Home</a>
-        <a href="#world">World</a>
-        <a href="#modes">Gamemodes</a>
-        <a href="#store">Store</a>
-        <a href="#staff">Staff</a>
-        <a href="#news">News</a>
-        <a href="#vote">Vote</a>
-        <a href="#rules">Rules</a>
-        <a class="nav-discord" id="navDiscord" href="#">Discord</a>
-        <button class="btn btn-primary btn-sm" onclick="copyIP()">Join</button>
-      </nav>
-      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-    </div>
-  </header>
+  stats: [
+    { value: 5200, suffix: "+", label: "Discord Members" },
+    { value: 2400, suffix: "+", label: "Registered Players" },
+    { value: 24, suffix: "/7", label: "Server Uptime" },
+    { value: 150, suffix: "+", label: "Custom Islands" },
+  ],
 
-  <!-- ══════════ HERO — CINEMATIC (aapki lobby image) ══════════ -->
-  <section class="hero" id="home">
-    <!-- Background layers -->
-    <div class="hero-bg" id="heroBg"></div>
-    <div class="hero-shade"></div>
-    <div class="hero-glow"></div>
-    <canvas class="hero-canvas" id="heroCanvas"></canvas>
+  showcase: {
+    image: "assets/island.jpg",
+    kicker: "THE WORLD OF WATTERCRAFT",
+    title: "One Island. Infinite Possibilities.",
+    description:
+      "Private floating islands, minions that work while you sleep, custom enchantments and a player-driven economy — all on a Hypixel-style map built for Bedrock.",
+    points: [
+      "Private Island System",
+      "Minion Automation",
+      "Custom Enchants & Swords",
+    ],
+    cta: "Start Your Island",
+  },
 
-    <!-- Content -->
-    <div class="hero-content">
-      <div class="hero-badge" id="heroBadge">BEDROCK SKYBLOCK • INDIA • 24/7</div>
+  gameModes: [
+    {
+      name: "Island Survival",
+      tag: "SKYBLOCK",
+      description:
+        "Build your floating island, expand your territory and climb the economic ladder.",
+      image: "assets/island.jpg",
+    },
+    {
+      name: "Minion System",
+      tag: "AUTOMATION",
+      description:
+        "Deploy minions that gather resources around the clock while you focus on progression.",
+      image: "",
+    },
+    {
+      name: "Custom Boss Fights",
+      tag: "PVE",
+      description:
+        "Take on custom bosses solo or with your squad for legendary drops and unique swords.",
+      image: "",
+    },
+    {
+      name: "Deep Mining",
+      tag: "PROGRESSION",
+      description:
+        "Descend into private mines, extract rare ores and forge custom tools.",
+      image: "",
+    },
+  ],
 
-      <div class="hero-logo-wrap" id="heroLogoWrap">
-        <img class="hero-logo" id="heroLogoImg" src="assets/logo.png" alt="WATTERCRAFT" />
-      </div>
+  features: [
+    { title: "Anti-Cheat", description: "A lag-free, cheat-free experience backed by active moderation." },
+    { title: "Real Economy", description: "Player shops, auctions and an earn-to-rank progression system." },
+    { title: "Weekly Events", description: "Skywars nights, build contests and scheduled drop parties." },
+    { title: "Low Ping India", description: "India-optimised hosting for stable 10–20 ms connections." },
+  ],
 
-      <p class="hero-type"><span id="heroType"></span><span class="type-caret"></span></p>
+  store: {
+    /* Cloudflare Worker URL. Until deployed, Buy buttons show a setup notice. */
+    api: "",
+    currency: "₹",
+    paymentNote: "Pay via UPI — GPay, PhonePe or Paytm. Your unique code is delivered instantly.",
+    packages: [
+      {
+        id: "vip",
+        name: "VIP",
+        price: 99,
+        color: "#4ade80",
+        badge: "POPULAR",
+        perks: [
+          "3 Island Slots",
+          "Island /fly Access",
+          "VIP Chat Prefix",
+          "2x Vote Rewards",
+        ],
+      },
+      {
+        id: "mvp",
+        name: "MVP",
+        price: 199,
+        color: "#22d3ee",
+        badge: "BEST VALUE",
+        perks: [
+          "5 Island Slots",
+          "/fly + /nick",
+          "MVP Prefix & Kits",
+          "3x Vote Rewards",
+          "Private Warp",
+        ],
+      },
+      {
+        id: "gems_500",
+        name: "500 Gems",
+        price: 49,
+        color: "#c084fc",
+        badge: "",
+        perks: ["500 Gems for shops, crates and upgrades."],
+      },
+      {
+        id: "gems_1000",
+        name: "1000 Gems",
+        price: 89,
+        color: "#fbbf24",
+        badge: "BONUS",
+        perks: ["1000 Gems + 200 bonus gems."],
+      },
+    ],
+  },
 
-      <div class="ip-box" onclick="copyIP()" title="Tap to copy">
-        <span class="ip-dot"></span>
-        <span class="ip-mono" id="ipText">play.wattercraft.fun</span>
-        <span class="ip-copy">COPY</span>
-      </div>
+  team: [
+    { name: "Anshhu07", role: "Owner", discord: "Anshhu07" },
+    /* Add members below. Avatars render automatically from Minecraft skins. */
+    // { name: "ExamplePlayer", role: "Admin", discord: "" },
+  ],
 
-      <div class="hero-btns">
-        <button class="btn btn-play btn-lg" onclick="copyIP()">▶ Play Now</button>
-        <a class="btn btn-ghost btn-lg" href="#store">🛒 Store &amp; Ranks</a>
-      </div>
+  news: [
+    {
+      date: "SEP 2026",
+      tag: "UPDATE",
+      title: "Season 2 — New Boss Island",
+      description:
+        "A new custom boss arena and legendary sword drops are now live on the network.",
+    },
+    {
+      date: "SEP 2026",
+      tag: "STORE",
+      title: "UPI Store is Live",
+      description:
+        "Purchase ranks and gems with GPay, PhonePe or Paytm — delivered in-game instantly.",
+    },
+    {
+      date: "AUG 2026",
+      tag: "EVENT",
+      title: "Skyblock Nights",
+      description:
+        "Double minion speed weekends and scheduled drop parties every Friday.",
+    },
+  ],
 
-      <div class="hero-mini">
-        <span class="mini on"><i class="dot"></i>Server Online</span>
-        <span>Custom Bosses</span>
-        <span>Minions</span>
-        <span>UPI Store</span>
-      </div>
-    </div>
+  voteSites: [
+    { name: "MCPE Planets", url: "https://example.com/vote1" }, // TODO: replace links
+    { name: "MCPE Servers", url: "https://example.com/vote2" },
+  ],
 
-    <!-- Floating island preview frame (aapka island screenshot) -->
-    <div class="hero-frame" id="heroFrame">
-      <div class="frame-glow"></div>
-      <img id="heroFrameImg" src="assets/island.jpg" alt="Skyblock Island" />
-      <div class="frame-cap"><span class="cap-live"></span> LIVE • SKYBLOCK ISLAND</div>
-    </div>
+  rules: [
+    "No hacking, X-ray or unfair modifications — instant ban.",
+    "No scamming or real-money trading outside approved systems.",
+    "Respect staff and players. Toxicity is not tolerated.",
+    "Griefing or raiding another player's island is punishable.",
+    "Exploiting bugs is prohibited — report them and earn a reward.",
+    "Duplicating items or currency results in a permanent ban.",
+  ],
 
-    <a class="scroll-down" href="#world" aria-label="Scroll"><span></span></a>
-  </section>
-
-  <!-- ══════════ MARQUEE TICKER ══════════ -->
-  <div class="ticker" aria-hidden="true">
-    <div class="ticker-track" id="tickerTrack"></div>
-  </div>
-
-  <!-- ══════════ STATS (animated counters) ══════════ -->
-  <section class="section stats-sec" id="stats">
-    <div class="container">
-      <div class="stats-row" id="statsRow"></div>
-    </div>
-  </section>
-
-  <!-- ══════════ FEATURED WORLD (island cinematic banner) ══════════ -->
-  <section class="featured" id="world">
-    <div class="featured-bg" id="featuredBg"></div>
-    <div class="featured-shade"></div>
-    <div class="container">
-      <div class="featured-content reveal">
-        <span class="kicker" id="featuredKicker">THE WORLD OF WATTERCRAFT</span>
-        <h2 class="featured-title" id="featuredTitle">One Island. Infinite Possibilities.</h2>
-        <p class="featured-desc" id="featuredDesc"></p>
-        <ul class="featured-points" id="featuredPoints"></ul>
-        <a class="btn btn-primary btn-lg" href="#join" onclick="openJoin();return false;">Start Your Island</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════ GAMEMODES ══════════ -->
-  <section class="section" id="modes">
-    <div class="container">
-      <h2 class="section-title reveal">Choose Your <em>Adventure</em></h2>
-      <p class="section-sub reveal">Har mode ek naya challenge — sab Hypixel-style map pe</p>
-      <div class="modes-grid" id="modesGrid"></div>
-    </div>
-  </section>
-
-  <!-- ══════════ FEATURES ══════════ -->
-  <section class="section alt" id="features">
-    <div class="container">
-      <h2 class="section-title reveal">Why <em>WatterCraft</em>?</h2>
-      <div class="features-grid" id="featuresGrid"></div>
-    </div>
-  </section>
-
-  <!-- ══════════ STORE (UPI) ══════════ -->
-  <section class="section store-sec" id="store">
-    <div class="container">
-      <h2 class="section-title reveal">Server <em>Store</em></h2>
-      <p class="section-sub reveal" id="storeNote">Pay via UPI • Instant in-game delivery</p>
-      <div class="store-grid" id="storeGrid"></div>
-      <p class="store-help reveal">Payment ke baad ek <b>unique code</b> milega → game me <span class="mono">/redeem CODE</span> likho → rank/gems turant mil jayenge. (Plugin se automatic)</p>
-    </div>
-  </section>
-
-  <!-- ══════════ STAFF ══════════ -->
-  <section class="section alt" id="staff">
-    <div class="container">
-      <h2 class="section-title reveal">Meet the <em>Team</em></h2>
-      <p class="section-sub reveal">Owner <b id="staffOwner">Anshhu07</b> &amp; staff — 24/7 aapke liye</p>
-      <div class="staff-grid" id="staffGrid"></div>
-    </div>
-  </section>
-
-  <!-- ══════════ NEWS ══════════ -->
-  <section class="section" id="news">
-    <div class="container">
-      <h2 class="section-title reveal">Latest <em>News</em></h2>
-      <div class="news-list" id="newsList"></div>
-    </div>
-  </section>
-
-  <!-- ══════════ VOTE ══════════ -->
-  <section class="section alt vote-sec" id="vote">
-    <div class="container narrow">
-      <h2 class="section-title reveal">Vote &amp; <em>Earn</em></h2>
-      <p class="section-sub reveal">Har vote = rewards in-game. Daily vote karo!</p>
-      <div class="vote-list" id="voteList"></div>
-    </div>
-  </section>
-
-  <!-- ══════════ RULES ══════════ -->
-  <section class="section" id="rules">
-    <div class="container narrow">
-      <h2 class="section-title reveal">Server <em>Rules</em></h2>
-      <div class="rules-list" id="rulesList"></div>
-    </div>
-  </section>
-
-  <!-- ══════════ DISCORD CTA ══════════ -->
-  <section class="discord-cta" id="discord">
-    <div class="container">
-      <div class="discord-box reveal">
-        <div class="discord-ico">💬</div>
-        <h2 id="discordTitle">Join 5,000+ Players on Discord</h2>
-        <p id="discordDesc">Giveaways, staff help, ban appeals aur events — sab yahan.</p>
-        <a class="btn btn-discord btn-lg" id="discordBtn" href="#">Join Discord Server</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════ FOOTER ══════════ -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-brand">
-        <span class="logo-ico">🌊</span>
-        <span class="logo-text">Watter<em>Craft</em></span>
-      </div>
-      <p class="footer-ip mono" onclick="copyIP()" title="Copy IP">play.wattercraft.fun : 19132</p>
-      <p class="footer-note">Not affiliated with Mojang or Microsoft. Minecraft is a trademark of Mojang AB.</p>
-      <p class="footer-copy">© <span id="footerYear">2026</span> WatterCraft — Owner <span id="footerOwner">Anshhu07</span>. All rights reserved.</p>
-    </div>
-  </footer>
-
-  <!-- ══════════ JOIN MODAL ══════════ -->
-  <div class="modal" id="joinModal" onclick="if(event.target===this)closeJoin()">
-    <div class="modal-box">
-      <button class="modal-x" onclick="closeJoin()">✕</button>
-      <h3>Join <em>WatterCraft</em></h3>
-      <p class="modal-sub">Minecraft (Bedrock) me:</p>
-      <p class="modal-ip mono" id="joinIp">play.wattercraft.fun</p>
-      <p class="modal-port">Port: <span class="mono" id="joinPort">19132</span> &nbsp;•&nbsp; <span id="joinVersions">Bedrock 1.20+</span></p>
-      <button class="btn btn-primary btn-block" onclick="copyIP()">📋 Copy IP</button>
-    </div>
-  </div>
-
-  <!-- ══════════ BUY MODAL (checkout) ══════════ -->
-  <div class="modal" id="buyModal" onclick="if(event.target===this)closeBuy()">
-    <div class="modal-box" id="buyBox">
-      <!-- main.js yahan package details + username form banayega -->
-    </div>
-  </div>
-
-  <!-- Data (V3) + Logic (V3) -->
-  <script src="data.js"></script>
-  <script src="main.js"></script>
-</body>
-</html>
+  discord: {
+    title: "Join 5,000+ Players on Discord",
+    description:
+      "Giveaways, staff support, ban appeals and community events — all in one place.",
+    cta: "Join the Discord",
+  },
+};
