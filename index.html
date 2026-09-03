@@ -1,118 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WatterCraft | Minecraft Bedrock SkyBlock</title>
-  <meta name="description" content="WatterCraft is a Minecraft Bedrock SkyBlock server featuring islands, skills, quests, collections, pets, minions, Bazaar, Auction House, Dungeons and more." />
-  <meta name="theme-color" content="#04070f" />
-  <meta property="og:title" content="WatterCraft | Minecraft Bedrock SkyBlock" />
-  <meta property="og:description" content="BUILD. PROGRESS. CONQUER. Join play.wattercraft.fun:19132 — SkyBlock, skills, quests, pets, minions, Bazaar and Dungeons on Bedrock." />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <link rel="canonical" href="https://anshuoppp.github.io/WatterCraft-web/" />
-  <!-- Inline favicon (no broken image if assets are missing) -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2322d3ee'/%3E%3Ctext x='16' y='23' font-family='Arial' font-size='20' font-weight='900' text-anchor='middle' fill='%2304263a'%3EW%3C/text%3E%3C/svg%3E" />
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-
-  <!-- Design system (File 2) -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Enable JS-only reveal styles (content visible without JS) -->
-  <script>document.documentElement.classList.add("js");</script>
-
-  <!-- Optional animation engine; site degrades gracefully without it -->
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WatterCraft | Minecraft Bedrock SkyBlock</title>
+<meta name="description" content="WatterCraft is a Minecraft Bedrock SkyBlock server featuring islands, skills, quests, collections, pets, minions, Bazaar, Auction House, Dungeons and more." />
+<meta name="theme-color" content="#04070f" />
+<meta property="og:title" content="WatterCraft | Minecraft Bedrock SkyBlock" />
+<meta property="og:description" content="BUILD. PROGRESS. CONQUER. Join play.wattercraft.fun:19132 — SkyBlock, skills, quests, pets, minions, Bazaar and Dungeons on Bedrock." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="canonical" href="https://anshuoppp.github.io/WatterCraft-web/" />
+<!-- Inline favicon (no broken image if assets are missing) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2322d3ee'/%3E%3Ctext x='16' y='23' font-family='Arial' font-size='20' font-weight='900' text-anchor='middle' fill='%2304263a'%3EW%3C/text%3E%3C/svg%3E" />
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<!-- Design system -->
+<link rel="stylesheet" href="style.css" />
+<!-- Enable JS-only reveal styles (content visible without JS) -->
+<script>document.documentElement.classList.add("js");</script>
+<!-- Optional animation engine; site degrades gracefully without it -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 </head>
 <body>
-
-  <!-- Ambient background layers -->
-  <div class="bg-scene" aria-hidden="true"></div>
-  <div class="bg-pixel" id="pixelField" aria-hidden="true"></div>
-
-  <!-- ══════════ NAVBAR ══════════ -->
-  <header class="nav" id="topNav">
-    <div class="nav-inner">
-      <a class="logo" href="#/home" aria-label="WatterCraft home">
-        <span class="logo-mark" aria-hidden="true">W</span>
-        <span class="logo-name">Watter<em>Craft</em></span>
-      </a>
-
-      <nav class="nav-links" id="navLinks" aria-label="Primary"></nav>
-
-      <div class="nav-right">
-        <button class="search-trigger" id="searchOpen" type="button" aria-label="Search">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-          <span class="txt">Search</span><kbd>Ctrl K</kbd>
-        </button>
-
-        <div class="status-pill" id="serverStatus" role="status" aria-live="polite">
-          <span class="status-dot" aria-hidden="true"></span>
-          <span class="txt">Checking…</span>
-        </div>
-
-        <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- ══════════ MOBILE DRAWER ══════════ -->
-  <div class="drawer" id="drawer" aria-hidden="true">
-    <div class="drawer-backdrop" data-close-drawer></div>
-    <nav class="drawer-panel" id="drawerLinks" aria-label="Mobile">
-      <a class="btn btn-discord btn-block drawer-cta" href="#/discord">Join Discord</a>
-    </nav>
-  </div>
-
-  <!-- ══════════ MAIN VIEW (router renders pages here) ══════════ -->
-  <main class="page" id="view" tabindex="-1"></main>
-
-  <!-- ══════════ FOOTER ══════════ -->
-  <footer class="site-footer">
-    <div class="container">
-      <div class="foot-grid" id="footerBox"></div>
-      <p class="foot-note" id="footNote"></p>
-    </div>
-  </footer>
-
-  <!-- ══════════ BUY MODAL ══════════ -->
-  <div class="modal" id="buyModal" role="dialog" aria-modal="true" aria-labelledby="buyTitle">
-    <div class="modal-backdrop" data-close-modal="buyModal"></div>
-    <div class="modal-card" id="buyBox"></div>
-  </div>
-
-  <!-- ══════════ SEARCH MODAL ══════════ -->
-  <div class="modal" id="searchModal" role="dialog" aria-modal="true" aria-label="Search WatterCraft">
-    <div class="modal-backdrop" data-close-modal="searchModal"></div>
-    <div class="modal-card" style="padding:22px;">
-      <button class="modal-close" type="button" data-close-modal="searchModal" aria-label="Close search">&times;</button>
-      <h3 class="mt-0" style="font-size:1.1rem;margin-bottom:14px;">Search</h3>
-      <input class="field" id="searchInput" type="search" placeholder="Items, guides, wiki, staff…" autocomplete="off" />
-      <div class="search-results" id="searchResults"></div>
-    </div>
-  </div>
-
-  <!-- Toast -->
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <!-- No-JS fallback -->
-  <noscript>
-    <div style="max-width:640px;margin:90px auto;padding:0 20px;text-align:center;color:#a9b8cf;font-family:sans-serif;">
-      <h1 style="color:#fff;">WatterCraft</h1>
-      <p>Please enable JavaScript to view the full website.</p>
-      <p style="margin-top:14px;">Server IP: <b>play.wattercraft.fun</b> port <b>19132</b></p>
-    </div>
-  </noscript>
-
-  <!-- Engine -->
-  <script src="data.js"></script>
-  <script src="main.js"></script>
+<!-- Ambient background layers -->
+<div class="bg-scene" aria-hidden="true"></div>
+<div class="bg-pixel" id="pixelField" aria-hidden="true"></div>
+<!-- ══════════ NAVBAR ══════════ -->
+<header class="nav" id="topNav">
+<div class="nav-inner">
+<a class="logo" href="#/home" aria-label="WatterCraft home">
+<span class="logo-mark" aria-hidden="true">W</span>
+<span class="logo-name">Watter<em>Craft</em></span>
+</a>
+<nav class="nav-links" id="navLinks" aria-label="Primary"></nav>
+<div class="nav-right">
+<button class="search-trigger" id="searchOpen" type="button" aria-label="Search">
+<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+<span class="txt">Search</span><kbd>Ctrl K</kbd>
+</button>
+<div class="status-pill" id="serverStatus" role="status" aria-live="polite">
+<span class="status-dot" aria-hidden="true"></span>
+<span class="txt">Checking…</span>
+</div>
+<button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false">
+<span></span><span></span><span></span>
+</button>
+</div>
+</div>
+</header>
+<!-- ══════════ MOBILE DRAWER ══════════ -->
+<div class="drawer" id="drawer" aria-hidden="true">
+<div class="drawer-backdrop" data-close-drawer></div>
+<nav class="drawer-panel" id="drawerLinks" aria-label="Mobile">
+<a class="btn btn-discord btn-block drawer-cta" href="#/discord">Join Discord</a>
+</nav>
+</div>
+<!-- ══════════ MAIN VIEW (router renders pages here) ══════════ -->
+<main class="page" id="view" tabindex="-1"></main>
+<!-- ══════════ FOOTER ══════════ -->
+<footer class="site-footer">
+<div class="container">
+<div class="foot-grid" id="footerBox"></div>
+<p class="foot-note" id="footNote"></p>
+</div>
+</footer>
+<!-- ══════════ BUY MODAL ══════════ -->
+<div class="modal" id="buyModal" role="dialog" aria-modal="true" aria-labelledby="buyTitle">
+<div class="modal-backdrop" data-close-modal="buyModal"></div>
+<div class="modal-card" id="buyBox"></div>
+</div>
+<!-- ══════════ SEARCH MODAL ══════════ -->
+<div class="modal" id="searchModal" role="dialog" aria-modal="true" aria-label="Search WatterCraft">
+<div class="modal-backdrop" data-close-modal="searchModal"></div>
+<div class="modal-card" style="padding:22px;">
+<button class="modal-close" type="button" data-close-modal="searchModal" aria-label="Close search">&times;</button>
+<h3 class="mt-0" style="font-size:1.1rem;margin-bottom:14px;">Search</h3>
+<input class="field" id="searchInput" type="search" placeholder="Items, guides, wiki, staff…" autocomplete="off" />
+<div class="search-results" id="searchResults"></div>
+</div>
+</div>
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<!-- No-JS fallback -->
+<noscript>
+<div style="max-width:640px;margin:90px auto;padding:0 20px;text-align:center;color:#a9b8cf;font-family:sans-serif;">
+<h1 style="color:#fff;">WatterCraft</h1>
+<p>Please enable JavaScript to view the full website.</p>
+<p style="margin-top:14px;">Server IP: <b>play.wattercraft.fun</b> port <b>19132</b></p>
+</div>
+</noscript>
+<!-- Engine: data → main → content (order matters) -->
+<script src="data.js"></script>
+<script src="main.js"></script>
+<script src="content-data.js"></script>
+<script src="content.js"></script>
 </body>
 </html>
