@@ -1,1 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WatterCraft Official | Bedrock Skyblock Server</title>
+  <meta name="description" content="WatterCraft — India's most advanced Bedrock Skyblock server. Join play.wattercraft.fun : 19132. Buy ranks & gems with UPI." />
+  <meta name="theme-color" content="#0a1628" />
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet" />
+
+  <!-- Design (Part 3) -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- 3D Engine (Three.js via free CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <!-- ══════════ NAVBAR ══════════ -->
+  <header class="nav" id="navbar">
+    <div class="nav-inner">
+      <a href="#home" class="logo">
+        <span class="logo-icon">🌊</span>
+        <span class="logo-text">Watter<span>Craft</span></span>
+      </a>
+      <nav class="nav-links" id="navLinks">
+        <a href="#home">Home</a>
+        <a href="#store">Store</a>
+        <a href="#ranks">Ranks</a>
+        <a href="#staff">Staff</a>
+        <a href="#news">News</a>
+        <a href="#vote">Vote</a>
+        <a href="#rules">Rules</a>
+        <a href="#discord" class="nav-discord">💬 Discord</a>
+        <button class="btn btn-primary btn-sm" onclick="copyIP()">▶ Join</button>
+      </nav>
+      <button class="hamburger" id="hamburger" aria-label="Menu">☰</button>
+    </div>
+  </header>
+
+  <!-- ══════════ HERO (3D WATER + ISLAND) ══════════ -->
+  <section class="hero" id="home">
+    <canvas id="hero3d"></canvas>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="hero-badge">🌍 BEDROCK SKYBLOCK • INDIA • 24/7</span>
+      <h1 class="hero-title">Watter<span>Craft</span></h1>
+      <p class="hero-tag" id="heroTagline">India's Most Advanced Bedrock Skyblock Server</p>
+      <div class="ip-box" onclick="copyIP()" title="Click to copy!">
+        <span class="ip-text" id="ipText">play.wattercraft.fun</span>
+        <span class="ip-copy">📋</span>
+      </div>
+      <div class="hero-btns">
+        <button class="btn btn-primary btn-lg" onclick="copyIP()">⚡ Join Server</button>
+        <a class="btn btn-ghost btn-lg" href="#store">🛒 Buy Ranks & Gems</a>
+      </div>
+      <div class="hero-mini">
+        <span>🟢 Server Online</span>
+        <span>🧊 Skyblock</span>
+        <span>💰 Economy</span>
+      </div>
+    </div>
+    <a href="#join" class="scroll-down">▼</a>
+  </section>
+
+  <!-- ══════════ JOIN ══════════ -->
+  <section class="section" id="join">
+    <div class="container">
+      <h2 class="section-title">How to <span>Join</span></h2>
+      <p class="section-sub">Bedrock (Mobile / Console / Windows) — 1 minute setup</p>
+      <div class="join-cards">
+        <div class="join-card" onclick="copyIP()">
+          <h4>🌐 Server Address</h4>
+          <p class="big mono" id="joinIp">play.wattercraft.fun</p>
+          <span class="join-hint">Tap to copy</span>
+        </div>
+        <div class="join-card">
+          <h4>🔢 Port</h4>
+          <p class="big mono" id="joinPort">19132</p>
+        </div>
+        <div class="join-card">
+          <h4>📦 Supported</h4>
+          <p class="big" id="joinVersions">1.20.1 – 1.26.30</p>
+          <p class="join-hint">Bedrock Edition</p>
+        </div>
+      </div>
+      <ol class="steps">
+        <li>Minecraft Bedrock kholo → <b>Play → Servers → Add Server</b></li>
+        <li>Server name me <b>WatterCraft</b> likho</li>
+        <li>Address: <b class="mono">play.wattercraft.fun</b> &amp; Port: <b class="mono">19132</b></li>
+        <li><b>Save</b> karo aur server join karo — Welcome to Skyblock! 🎉</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ══════════ ABOUT / STATS ══════════ -->
+  <section class="section section-dark" id="about">
+    <div class="container">
+      <h2 class="section-title">About <span>WatterCraft</span></h2>
+      <p class="about-text">WatterCraft is a custom Skyblock server built for Bedrock players — custom islands, working economy, grinding, PvP arenas aur bahut kuch. Owner: <b class="mono">Anshhu07</b> 👑</p>
+      <div class="stats">
+        <div class="stat"><h3>24/7</h3><p>Uptime</p></div>
+        <div class="stat"><h3>100+</h3><p>Custom Islands</p></div>
+        <div class="stat"><h3>⚡</h3><p>Instant Store Delivery</p></div>
+        <div class="stat"><h3>₹</h3><p>UPI Payments</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ STORE / GEMS ══════════ -->
+  <section class="section" id="store">
+    <div class="container">
+      <h2 class="section-title">🛒 Store — <span>UPI Payments</span></h2>
+      <p class="section-sub" id="storeNote">Pay via UPI (GPay, PhonePe, Paytm) — rank & gems AUTO deliver hote hain</p>
+      <h3 class="mini-title">💎 Gems</h3>
+      <div class="grid gems-grid" id="gemsGrid"><!-- data.js se bhar jayega --></div>
+      <h3 class="mini-title">👑 Ranks</h3>
+      <div class="grid ranks-grid" id="ranksGrid"><!-- data.js se bhar jayega --></div>
+      <div class="store-cta">
+        <p>Pura store browse karo — all ranks, gems &amp; kits:</p>
+        <a class="btn btn-primary btn-lg" id="storeBtn" href="#" target="_blank" rel="noopener">🚀 Open Full Store</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ STAFF TEAM ══════════ -->
+  <section class="section section-dark" id="staff">
+    <div class="container">
+      <h2 class="section-title">Staff <span>Team</span></h2>
+      <p class="section-sub">Hamari team — kisi bhi problem pe staff se baat karo</p>
+      <div class="grid staff-grid" id="staffGrid"><!-- data.js se bhar jayega --></div>
+    </div>
+  </section>
+
+  <!-- ══════════ NEWS ══════════ -->
+  <section class="section" id="news">
+    <div class="container">
+      <h2 class="section-title">News & <span>Updates</span></h2>
+      <div class="news-list" id="newsList"><!-- data.js se bhar jayega --></div>
+    </div>
+  </section>
+
+  <!-- ══════════ VOTE ══════════ -->
+  <section class="section section-dark" id="vote">
+    <div class="container">
+      <h2 class="section-title">🗳️ Vote for <span>Rewards</span></h2>
+      <p class="section-sub">Vote karo aur in-game rewards pao — free gems har vote pe!</p>
+      <div class="vote-btns" id="voteBtns"><!-- data.js se bhar jayega --></div>
+    </div>
+  </section>
+
+  <!-- ══════════ RULES ══════════ -->
+  <section class="section" id="rules">
+    <div class="container">
+      <h2 class="section-title">Server <span>Rules</span></h2>
+      <ol class="rules-list" id="rulesList"><!-- data.js se bhar jayega --></ol>
+    </div>
+  </section>
+
+  <!-- ══════════ DISCORD ══════════ -->
+  <section class="section discord-section" id="discord">
+    <div class="container discord-box">
+      <h2 id="discordHeading">Join Our Community 💬</h2>
+      <p id="discordText">24/7 support, events, giveaways aur sabse pehle updates — sab Discord pe.</p>
+      <a class="btn btn-discord btn-lg" id="discordBtn" href="#" target="_blank" rel="noopener">💬 Join WatterCraft Discord</a>
+    </div>
+  </section>
+
+  <!-- ══════════ FOOTER ══════════ -->
+  <footer class="footer">
+    <p class="mono">🌊 WatterCraft Official</p>
+    <p>Owner: <b class="mono">Anshhu07</b> • Not affiliated with Mojang / Microsoft</p>
+    <p class="footer-links">
+      <a href="#store">Store</a> • <a href="#staff">Staff</a> • <a href="#rules">Rules</a> • <a href="#discord">Discord</a>
+    </p>
+    <p class="footer-copy">© 2025 WatterCraft. All rights reserved.</p>
+  </footer>
+
+  <!-- ══════════ COPY IP MODAL ══════════ -->
+  <div class="modal" id="ipModal">
+    <div class="modal-box">
+      <h3>✅ Server IP Copied!</h3>
+      <p class="mono big" id="modalIp">play.wattercraft.fun</p>
+      <p>Minecraft me <b>Servers → Add Server</b> me paste karo. Port: <b class="mono">19132</b></p>
+      <button class="btn btn-primary" onclick="closeModal()">Got it!</button>
+    </div>
+  </div>
+
+  <!-- Data (Part 1) phir Logic (Part 4) -->
+  <script src="data.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
