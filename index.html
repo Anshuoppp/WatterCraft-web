@@ -4,219 +4,233 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WatterCraft Official | Bedrock Skyblock Server</title>
-  <meta name="description" content="WatterCraft — India's most advanced Bedrock Skyblock server. Join play.wattercraft.fun:19132. Buy ranks & gems with UPI — instant in-game delivery." />
-  <meta name="theme-color" content="#050d1a" />
+  <meta name="description" content="WatterCraft — India's most cinematic Bedrock Skyblock server. Join play.wattercraft.fun:19132. UPI store with instant in-game delivery." />
+  <meta name="theme-color" content="#030812" />
+  <link rel="icon" type="image/png" href="assets/mark.png" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Design -->
+  <!-- Design (Part 3) -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+  <!-- ══════════ PRELOADER (cinematic intro) ══════════ -->
+  <div class="loader" id="loader">
+    <div class="loader-inner">
+      <div class="loader-mark"><img src="assets/mark.png" alt="W" /></div>
+      <div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div>
+      <div class="loader-text" id="loaderText">LOADING WATTERCRAFT</div>
+      <div class="loader-sub" id="loaderSub">Survive. Build. Dominate the Skies.</div>
+    </div>
+  </div>
 
   <!-- ══════════ NAVBAR ══════════ -->
   <header class="nav" id="navbar">
     <div class="nav-inner">
       <a href="#home" class="logo">
-        <span class="logo-mark">W</span>
+        <span class="logo-ico">🌊</span>
         <span class="logo-text">Watter<em>Craft</em></span>
       </a>
       <nav class="nav-links" id="navLinks">
+        <a href="#home">Home</a>
+        <a href="#world">World</a>
         <a href="#modes">Gamemodes</a>
         <a href="#store">Store</a>
         <a href="#staff">Staff</a>
         <a href="#news">News</a>
         <a href="#vote">Vote</a>
         <a href="#rules">Rules</a>
-        <a class="nav-discord" href="#" id="navDiscord">Discord</a>
+        <a class="nav-discord" id="navDiscord" href="#">Discord</a>
         <button class="btn btn-primary btn-sm" onclick="copyIP()">Join</button>
       </nav>
       <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </header>
 
-  <!-- ══════════ HERO — REAL GAMEPLAY VIDEO ══════════ -->
+  <!-- ══════════ HERO — CINEMATIC (aapki lobby image) ══════════ -->
   <section class="hero" id="home">
-    <div class="hero-media">
-      <video id="heroVideo" autoplay muted loop playsinline preload="metadata"></video>
-      <div class="hero-shade"></div>
-      <div class="hero-fade"></div>
-    </div>
+    <!-- Background layers -->
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-shade"></div>
+    <div class="hero-glow"></div>
+    <canvas class="hero-canvas" id="heroCanvas"></canvas>
+
+    <!-- Content -->
     <div class="hero-content">
-      <span class="hero-badge" id="heroBadge">BEDROCK SKYBLOCK • 24/7 • INDIA</span>
-      <h1 class="hero-title">Watter<em>Craft</em></h1>
-      <p class="hero-tag" id="heroTagline">Survive. Build. Dominate the Skies.</p>
-      <div class="ip-box" onclick="copyIP()" title="Click to copy!">
+      <div class="hero-badge" id="heroBadge">BEDROCK SKYBLOCK • INDIA • 24/7</div>
+
+      <div class="hero-logo-wrap" id="heroLogoWrap">
+        <img class="hero-logo" id="heroLogoImg" src="assets/logo.png" alt="WATTERCRAFT" />
+      </div>
+
+      <p class="hero-type"><span id="heroType"></span><span class="type-caret"></span></p>
+
+      <div class="ip-box" onclick="copyIP()" title="Tap to copy">
         <span class="ip-dot"></span>
-        <span class="ip-text" id="ipText">play.wattercraft.fun</span>
-        <span class="ip-copy">Copy</span>
+        <span class="ip-mono" id="ipText">play.wattercraft.fun</span>
+        <span class="ip-copy">COPY</span>
       </div>
+
       <div class="hero-btns">
-        <button class="btn btn-primary btn-lg" onclick="copyIP()">▶ Play Now</button>
-        <a class="btn btn-ghost btn-lg" href="#store">Store &amp; Ranks</a>
+        <button class="btn btn-play btn-lg" onclick="copyIP()">▶ Play Now</button>
+        <a class="btn btn-ghost btn-lg" href="#store">🛒 Store &amp; Ranks</a>
       </div>
+
       <div class="hero-mini">
         <span class="mini on"><i class="dot"></i>Server Online</span>
-        <span class="mini">Skyblock</span>
-        <span class="mini">Custom Bosses</span>
-        <span class="mini">UPI Store</span>
+        <span>Custom Bosses</span>
+        <span>Minions</span>
+        <span>UPI Store</span>
       </div>
     </div>
-    <a href="#modes" class="scroll-down" aria-label="Scroll">↓</a>
+
+    <!-- Floating island preview frame (aapka island screenshot) -->
+    <div class="hero-frame" id="heroFrame">
+      <div class="frame-glow"></div>
+      <img id="heroFrameImg" src="assets/island.jpg" alt="Skyblock Island" />
+      <div class="frame-cap"><span class="cap-live"></span> LIVE • SKYBLOCK ISLAND</div>
+    </div>
+
+    <a class="scroll-down" href="#world" aria-label="Scroll"><span></span></a>
   </section>
 
-  <!-- ══════════ STATS ══════════ -->
-  <section class="stats" id="stats">
-    <div class="container stats-row" id="statsRow"><!-- data.js se --></div>
+  <!-- ══════════ MARQUEE TICKER ══════════ -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+
+  <!-- ══════════ STATS (animated counters) ══════════ -->
+  <section class="section stats-sec" id="stats">
+    <div class="container">
+      <div class="stats-row" id="statsRow"></div>
+    </div>
+  </section>
+
+  <!-- ══════════ FEATURED WORLD (island cinematic banner) ══════════ -->
+  <section class="featured" id="world">
+    <div class="featured-bg" id="featuredBg"></div>
+    <div class="featured-shade"></div>
+    <div class="container">
+      <div class="featured-content reveal">
+        <span class="kicker" id="featuredKicker">THE WORLD OF WATTERCRAFT</span>
+        <h2 class="featured-title" id="featuredTitle">One Island. Infinite Possibilities.</h2>
+        <p class="featured-desc" id="featuredDesc"></p>
+        <ul class="featured-points" id="featuredPoints"></ul>
+        <a class="btn btn-primary btn-lg" href="#join" onclick="openJoin();return false;">Start Your Island</a>
+      </div>
+    </div>
   </section>
 
   <!-- ══════════ GAMEMODES ══════════ -->
   <section class="section" id="modes">
     <div class="container">
-      <div class="sec-head">
-        <span class="sec-kicker">Game Modes</span>
-        <h2 class="sec-title">Explore <em>WatterCraft</em></h2>
-        <p class="sec-sub">Hypixel-style map — Skyblock, Minions, Custom Bosses aur bahut kuch.</p>
-      </div>
-      <div class="modes-grid" id="modesGrid"><!-- data.js se --></div>
+      <h2 class="section-title reveal">Choose Your <em>Adventure</em></h2>
+      <p class="section-sub reveal">Har mode ek naya challenge — sab Hypixel-style map pe</p>
+      <div class="modes-grid" id="modesGrid"></div>
     </div>
   </section>
 
-  <!-- ══════════ HOW TO JOIN ══════════ -->
-  <section class="section section-alt" id="join">
+  <!-- ══════════ FEATURES ══════════ -->
+  <section class="section alt" id="features">
     <div class="container">
-      <div class="sec-head">
-        <span class="sec-kicker">Get Started</span>
-        <h2 class="sec-title">How to <em>Join</em></h2>
-      </div>
-      <div class="join-steps">
-        <div class="join-step"><span class="join-num">1</span><h4>Copy the IP</h4><p class="mono">play.wattercraft.fun</p></div>
-        <div class="join-step"><span class="join-num">2</span><h4>Add Server</h4><p>Minecraft → Servers → Add Server</p></div>
-        <div class="join-step"><span class="join-num">3</span><h4>Port &amp; Play</h4><p>Port: <span class="mono">19132</span> · Version: <span class="mono" id="joinVersions">Bedrock 1.20+</span></p></div>
-      </div>
+      <h2 class="section-title reveal">Why <em>WatterCraft</em>?</h2>
+      <div class="features-grid" id="featuresGrid"></div>
     </div>
   </section>
 
-  <!-- ══════════ STORE (UPI CONNECT SYSTEM) ══════════ -->
+  <!-- ══════════ STORE (UPI) ══════════ -->
   <section class="section store-sec" id="store">
     <div class="container">
-      <div class="sec-head">
-        <span class="sec-kicker">Store</span>
-        <h2 class="sec-title">Ranks &amp; <em>Gems</em></h2>
-        <p class="sec-sub" id="storeNote">UPI se pay karo → unique code → in-game /redeem → instant delivery!</p>
-      </div>
-
-      <!-- Steps -->
-      <div class="store-steps" id="storeSteps"><!-- data.js se --></div>
-
-      <!-- Packages -->
-      <div class="store-grid" id="storeGrid"><!-- main.js render karega --></div>
-
-      <p class="store-secure">🔒 Secure UPI payment via Razorpay · GPay · PhonePe · Paytm supported · Instant automatic delivery</p>
+      <h2 class="section-title reveal">Server <em>Store</em></h2>
+      <p class="section-sub reveal" id="storeNote">Pay via UPI • Instant in-game delivery</p>
+      <div class="store-grid" id="storeGrid"></div>
+      <p class="store-help reveal">Payment ke baad ek <b>unique code</b> milega → game me <span class="mono">/redeem CODE</span> likho → rank/gems turant mil jayenge. (Plugin se automatic)</p>
     </div>
   </section>
 
   <!-- ══════════ STAFF ══════════ -->
-  <section class="section" id="staff">
+  <section class="section alt" id="staff">
     <div class="container">
-      <div class="sec-head">
-        <span class="sec-kicker">Team</span>
-        <h2 class="sec-title">Staff <em>Team</em></h2>
-        <p class="sec-sub">Owner: <b id="staffOwner">Anshhu07</b> — trusted staff jo server ko chalate hain.</p>
-      </div>
-      <div class="staff-grid" id="staffGrid"><!-- data.js se --></div>
+      <h2 class="section-title reveal">Meet the <em>Team</em></h2>
+      <p class="section-sub reveal">Owner <b id="staffOwner">Anshhu07</b> &amp; staff — 24/7 aapke liye</p>
+      <div class="staff-grid" id="staffGrid"></div>
     </div>
   </section>
 
   <!-- ══════════ NEWS ══════════ -->
-  <section class="section section-alt" id="news">
+  <section class="section" id="news">
     <div class="container">
-      <div class="sec-head">
-        <span class="sec-kicker">Updates</span>
-        <h2 class="sec-title">News &amp; <em>Changelog</em></h2>
-      </div>
-      <div class="news-list" id="newsList"><!-- data.js se --></div>
+      <h2 class="section-title reveal">Latest <em>News</em></h2>
+      <div class="news-list" id="newsList"></div>
     </div>
   </section>
 
   <!-- ══════════ VOTE ══════════ -->
-  <section class="section" id="vote">
-    <div class="container vote-box">
-      <div>
-        <span class="sec-kicker">Support Us</span>
-        <h2 class="sec-title">Vote for <em>WatterCraft</em></h2>
-        <p class="sec-sub" id="voteRewards">Vote karo → rewards + vote crates!</p>
-      </div>
-      <div class="vote-btns" id="voteRow"><!-- data.js se --></div>
+  <section class="section alt vote-sec" id="vote">
+    <div class="container narrow">
+      <h2 class="section-title reveal">Vote &amp; <em>Earn</em></h2>
+      <p class="section-sub reveal">Har vote = rewards in-game. Daily vote karo!</p>
+      <div class="vote-list" id="voteList"></div>
     </div>
   </section>
 
   <!-- ══════════ RULES ══════════ -->
-  <section class="section section-alt" id="rules">
-    <div class="container">
-      <div class="sec-head">
-        <span class="sec-kicker">Fair Play</span>
-        <h2 class="sec-title">Server <em>Rules</em></h2>
-      </div>
-      <ul class="rules-list" id="rulesList"><!-- data.js se --></ul>
+  <section class="section" id="rules">
+    <div class="container narrow">
+      <h2 class="section-title reveal">Server <em>Rules</em></h2>
+      <div class="rules-list" id="rulesList"></div>
     </div>
   </section>
 
   <!-- ══════════ DISCORD CTA ══════════ -->
-  <section class="section discord-sec" id="discord">
-    <div class="container discord-box">
-      <div class="discord-ico">💬</div>
-      <h2 class="discord-title" id="discordTitle">WatterCraft Community</h2>
-      <p class="discord-sub" id="discordDesc">Updates, events, giveaways, support aur staff help — sab yahan.</p>
-      <a class="btn btn-discord btn-lg" href="#" id="discordBtn" target="_blank" rel="noopener">Join our Discord</a>
+  <section class="discord-cta" id="discord">
+    <div class="container">
+      <div class="discord-box reveal">
+        <div class="discord-ico">💬</div>
+        <h2 id="discordTitle">Join 5,000+ Players on Discord</h2>
+        <p id="discordDesc">Giveaways, staff help, ban appeals aur events — sab yahan.</p>
+        <a class="btn btn-discord btn-lg" id="discordBtn" href="#">Join Discord Server</a>
+      </div>
     </div>
   </section>
 
   <!-- ══════════ FOOTER ══════════ -->
   <footer class="footer">
-    <p class="footer-logo">Watter<em>Craft</em></p>
-    <p>Not affiliated with Mojang or Microsoft. Made with ❤️ by <b id="footerOwner">Anshhu07</b></p>
-    <p class="footer-meta">© <span id="year"></span> WatterCraft Official · All rights reserved</p>
+    <div class="container">
+      <div class="footer-brand">
+        <span class="logo-ico">🌊</span>
+        <span class="logo-text">Watter<em>Craft</em></span>
+      </div>
+      <p class="footer-ip mono" onclick="copyIP()" title="Copy IP">play.wattercraft.fun : 19132</p>
+      <p class="footer-note">Not affiliated with Mojang or Microsoft. Minecraft is a trademark of Mojang AB.</p>
+      <p class="footer-copy">© <span id="footerYear">2026</span> WatterCraft — Owner <span id="footerOwner">Anshhu07</span>. All rights reserved.</p>
+    </div>
   </footer>
 
-  <!-- ══════════ STORE MODAL (buy flow) ══════════ -->
-  <div class="modal" id="storeModal">
+  <!-- ══════════ JOIN MODAL ══════════ -->
+  <div class="modal" id="joinModal" onclick="if(event.target===this)closeJoin()">
     <div class="modal-box">
-      <button class="modal-close" onclick="closeStoreModal()">✕</button>
-      <h3>Confirm Purchase</h3>
-      <div class="modal-pkg" id="modalPkgInfo"></div>
-      <label class="field">
-        <span>Minecraft Username</span>
-        <input type="text" id="buyName" placeholder="Your in-game name" maxlength="24" autocomplete="off" />
-      </label>
-      <label class="field">
-        <span>Email (optional — code copy ke liye)</span>
-        <input type="email" id="buyEmail" placeholder="you@email.com" autocomplete="off" />
-      </label>
-      <p class="modal-status" id="modalStatus"></p>
-      <div class="modal-actions">
-        <button class="btn btn-ghost" onclick="closeStoreModal()">Cancel</button>
-        <button class="btn btn-primary" id="modalConfirm" onclick="startCheckout()">Pay via UPI →</button>
-      </div>
+      <button class="modal-x" onclick="closeJoin()">✕</button>
+      <h3>Join <em>WatterCraft</em></h3>
+      <p class="modal-sub">Minecraft (Bedrock) me:</p>
+      <p class="modal-ip mono" id="joinIp">play.wattercraft.fun</p>
+      <p class="modal-port">Port: <span class="mono" id="joinPort">19132</span> &nbsp;•&nbsp; <span id="joinVersions">Bedrock 1.20+</span></p>
+      <button class="btn btn-primary btn-block" onclick="copyIP()">📋 Copy IP</button>
     </div>
   </div>
 
-  <!-- ══════════ JOIN / IP MODAL ══════════ -->
-  <div class="modal" id="joinModal">
-    <div class="modal-box">
-      <button class="modal-close" onclick="closeJoinModal()">✕</button>
-      <h3>🌊 Join WatterCraft</h3>
-      <p>Minecraft me <b>Servers → Add Server</b> me ye daalo:</p>
-      <div class="modal-ip mono" id="joinIp">play.wattercraft.fun</div>
-      <p>Port: <span class="mono" id="joinPort">19132</span></p>
-      <button class="btn btn-primary btn-block" onclick="closeJoinModal()">Got it!</button>
+  <!-- ══════════ BUY MODAL (checkout) ══════════ -->
+  <div class="modal" id="buyModal" onclick="if(event.target===this)closeBuy()">
+    <div class="modal-box" id="buyBox">
+      <!-- main.js yahan package details + username form banayega -->
     </div>
   </div>
 
-  <!-- Data (V2) + Logic (V2) -->
+  <!-- Data (V3) + Logic (V3) -->
   <script src="data.js"></script>
   <script src="main.js"></script>
 </body>
