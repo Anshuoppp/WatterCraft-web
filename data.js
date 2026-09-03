@@ -1,229 +1,177 @@
 /* ============================================================
-   WATTERCRAFT OFFICIAL — DATA v2 (Aapka Control Panel)
-   Coding ki zaroorat nahi — bas yahan edit karo.
-   ⚠️ Store package ke ID worker.js (PACKAGES) se match hone
-   chahiye: vip, mvp, gems_500, gems_1000
+   WATTERCRAFT OFFICIAL — DATA V3 (Cinematic Edition)
+   Aapka control panel — yahan edit karo, code chhodo.
+   Store package IDs worker.js se match karo: vip, mvp,
+   gems_500, gems_1000
    ============================================================ */
 
 const WC = {
-  /* ================= SERVER INFO ================= */
+
+  /* ---------- BRAND / LOGO ---------- */
+  brand: {
+    name: "WatterCraft",
+    logo: "assets/logo.png",      // ⚠️ WATTERCRAFT 3D logo upload karo
+    mark: "assets/mark.png",      // white "w" (loader/favicon)
+    accent: "#22d3ee",            // cyan
+    accent2: "#fb923c"            // orange — aapke logo ki bar se
+  },
+
+  /* ---------- PRELOADER ---------- */
+  preloader: {
+    text: "LOADING WATTERCRAFT",
+    sub: "Survive. Build. Dominate the Skies."
+  },
+
+  /* ---------- HERO (CINEMATIC) ---------- */
+  hero: {
+    bg: "assets/lobby.png",       // ⚠️ lobby screenshot
+    islandImg: "assets/island.jpg", // ⚠️ island screenshot (floating layer)
+    taglines: [
+      "Survive. Build. Dominate the Skies.",
+      "Hypixel-Style Skyblock on Bedrock.",
+      "Custom Bosses • Minions • Real Economy."
+    ],
+    ipNote: "Tap to copy the IP"
+  },
+
+  /* ---------- SCROLLING TICKER ---------- */
+  marquee: [
+    "SKYBLOCK", "CUSTOM BOSSES", "MINION SYSTEM",
+    "DEEP MINING", "UPI STORE", "24/7 UPTIME",
+    "BEDROCK 1.20+", "MADE IN INDIA"
+  ],
+
+  /* ---------- SERVER INFO ---------- */
   server: {
     name: "WatterCraft",
-    tagline: "Survive. Build. Dominate the Skies.",
     ip: "play.wattercraft.fun",
     port: "19132",
     versions: "Bedrock 1.20+",
-    region: "🇮🇳 India",
+    region: "India",
     status: "online",
     owner: "Anshhu07",
-    ownerDiscord: "Anshhu07",                    // ⚠️ apna discord id
-    discord: "https://discord.gg/WATTERCRAFT",   // ⚠️ APNA DISCORD LINK LAGAO
-    storeUrl: "https://wc-store.YOURUSER.workers.dev",  // ⚠️ Worker URL (checkout API)
+    ownerDiscord: "Anshhu07",
+    discord: "https://discord.gg/WATTERCRAFT",  // ⚠️ apna link
+    storeApi: "https://wc-store.YOURUSER.workers.dev" // ⚠️ worker URL
   },
 
-  /* ================= HERO =================
-     assets/hero.mp4 (video) + assets/hero.jpg (poster)
-     Video nahi hai → sirf poster image kaam karegi */
-  hero: {
-    video: "assets/hero.mp4",
-    poster: "assets/hero.jpg",
-    badge: "BEDROCK SKYBLOCK  •  24/7  •  INDIA",
-  },
-
-  /* ================= STATS BAR ================= */
+  /* ---------- ANIMATED STATS ---------- */
   stats: [
-    { value: "5,000+", label: "Discord Members" },
-    { value: "2,000+", label: "Registered Players" },
-    { value: "24/7",   label: "Uptime" },
-    { value: "1.20+",  label: "Supported Versions" },
+    { value: 5200, suffix: "+", label: "Discord Members" },
+    { value: 2400, suffix: "+", label: "Registered Players" },
+    { value: 24,   suffix: "/7", label: "Server Uptime" },
+    { value: 150,  suffix: "+", label: "Custom Islands" }
   ],
 
-  /* ================= GAMEMODES / SHOWCASE =================
-     Images yahan daalo: assets/modes/<name>.jpg
-     (Aapke server ke asli screenshots/clips best lagte hain) */
+  /* ---------- FEATURED WORLD (big cinematic banner) ----------
+     Aapki island screenshot yahan full-screen parallax banegi */
+  featured: {
+    img: "assets/island.jpg",
+    kicker: "THE WORLD OF WATTERCRAFT",
+    title: "One Island. Infinite Possibilities.",
+    desc: "Hypixel-style floating islands, private worlds, minions jo aapke liye kaam karte hain, aur sky-high custom builds — sab ek sath.",
+    points: ["Private Island System", "Minion Automation", "Custom Enchants & Swords"]
+  },
+
+  /* ---------- GAMEMODES / SHOWCASE ----------
+     img: screenshot ho to use hota hai, warna animated gradient */
   gamemodes: [
     {
-      id: "island",
-      icon: "🏝️",
-      tag: "SKYBLOCK",
+      id: "island", icon: "🏝",
       title: "Island Survival",
-      desc: "Apni floating island banao, bado aur survival me sabse upar jao. Hypixel-style map pe pure Skyblock experience.",
-      poster: "assets/modes/island.jpg",
-      video: "assets/modes/island.mp4",          // optional
+      tag: "SKYBLOCK",
+      desc: "Apni floating island banao, expand karo aur economy me top par jao.",
+      img: "assets/island.jpg"
     },
     {
-      id: "minions",
-      icon: "🤖",
-      tag: "AUTOMATION",
+      id: "minions", icon: "⚙",
       title: "Minion System",
-      desc: "Minions lagaao jo khud resources collect karein — aap soye raho, farm chalti rahe.",
-      poster: "assets/modes/minions.jpg",
-      video: "",
+      tag: "AUTOMATION",
+      desc: "Minions lagao jo khud collect karein — aap so jao, farm chalti rahe.",
+      img: ""
     },
     {
-      id: "boss",
-      icon: "⚔️",
-      tag: "PVE",
+      id: "boss", icon: "⚔",
       title: "Custom Boss Fights",
-      desc: "Hamare custom bosses ko solo ya squad ke saath fight karo — legendary drops aur unique swords kaate.",
-      poster: "assets/modes/boss.jpg",
-      video: "assets/modes/boss.mp4",            // optional
+      tag: "PVE",
+      desc: "Custom bosses ko solo ya squad me fight karo — legendary drops aur unique swords.",
+      img: ""
     },
     {
-      id: "mining",
-      icon: "⛏️",
+      id: "mining", icon: "⛏",
+      title: "Deep Mining",
       tag: "PROGRESSION",
-      title: "Deep Mining & Ores",
-      desc: "Private mines me deep jao, rare ores nikalo, custom swords aur tools craft karo.",
-      poster: "assets/modes/mining.jpg",
-      video: "",
-    },
+      desc: "Private mines me deep jao, rare ores aur custom tools craft karo.",
+      img: ""
+    }
   ],
 
-  /* ================= STORE (UPI — connect system) =================
-     🔴 Package IDs worker.js ke PACKAGES se MATCH hone chahiye:
-        vip, mvp, gems_500, gems_1000
-     Naya package add karna → dono files me same id daalo */
+  /* ---------- FEATURES (mini cards) ---------- */
+  features: [
+    { icon: "🛡", title: "Anti-Cheat", desc: "Fair play — lag-free aur cheat-free experience." },
+    { icon: "💰", title: "Real Economy", desc: "Player shops, auctions aur earn-to-rank system." },
+    { icon: "🎉", title: "Weekly Events", desc: "Skywars nights, build contests, drop parties." },
+    { icon: "⚡", title: "Low Ping India", desc: "Delhi/Mumbai hosts — 10-20ms for Indian players." }
+  ],
+
+  /* ---------- STORE (UPI) ---------- */
   store: {
-    enabled: true,
-    api: "https://wc-store.YOURUSER.workers.dev",  // ⚠️ checkout API (server.api.storeUrl bhi update karo)
-    note: "UPI se pay karo (GPay, PhonePe, Paytm) → unique code milega → in-game /redeem karo. Delivery automatic!",
-    steps: [
-      "Buy dabao → UPI se payment karo",
-      "Unique code milega (WC-XXXX-XXXX)",
-      "In-game /redeem <code> type karo",
-      "Rank/Gems turant grant! ✅",
-    ],
+    api: "https://wc-store.YOURUSER.workers.dev", // ⚠️ worker
+    note: "Pay via UPI (GPay • PhonePe • Paytm) → unique code → /redeem in-game",
     packages: [
-      {
-        id: "vip",
-        name: "VIP",
-        type: "rank",
-        price: 99,
-        icon: "🟢",
-        color: "#55ff55",
-        tag: "",
-        featured: false,
-        perks: [
-          "2 Extra Island Slots",
-          "/fly (Skyblock)",
-          "VIP Chat Color",
-          "2x Vote Rewards",
-          "Special VIP Tag",
-        ],
-      },
-      {
-        id: "mvp",
-        name: "MVP",
-        type: "rank",
-        price: 199,
-        icon: "💎",
-        color: "#55ffff",
-        tag: "MOST POPULAR",
-        featured: true,
-        perks: [
-          "5 Extra Island Slots",
-          "/fly + /nick",
-          "MVP Chat Color",
-          "3x Vote Rewards",
-          "Weekly Mystery Crate",
-          "MVP Tag + Glow",
-        ],
-      },
-      {
-        id: "gems_500",
-        name: "500 Gems",
-        type: "gems",
-        price: 49,
-        icon: "💠",
-        color: "#38bdf8",
-        tag: "",
-        featured: false,
-        perks: [
-          "500 Gems balance",
-          "Shop me kharidne layak",
-          "Instant in-game delivery",
-        ],
-      },
-      {
-        id: "gems_1000",
-        name: "1000 Gems",
-        type: "gems",
-        price: 89,
-        icon: "💠",
-        color: "#38bdf8",
-        tag: "BEST VALUE",
-        featured: false,
-        perks: [
-          "1000 Gems balance",
-          "500 Gems se 2x zyada",
-          "Instant in-game delivery",
-        ],
-      },
-    ],
+      { id: "vip",      name: "VIP",      price: 99,  color: "#4ade80", tag: "POPULAR",
+        perks: ["3 Island Slots", "/fly on island", "VIP Chat Prefix", "2x Vote Rewards"] },
+      { id: "mvp",      name: "MVP",      price: 199, color: "#22d3ee", tag: "BEST VALUE",
+        perks: ["5 Island Slots", "/fly + /nick", "MVP Prefix + Kits", "3x Vote Rewards", "Private Warp"] },
+      { id: "gems_500", name: "500 Gems", price: 49,  color: "#c084fc", tag: "",
+        perks: ["500 Gems — Shop, Crates, Upgrades me use karo"] },
+      { id: "gems_1000",name: "1000 Gems",price: 89,  color: "#fbbf24", tag: "20% BONUS",
+        perks: ["1000 Gems + 200 Bonus Gems"] }
+    ]
   },
 
-  /* ================= STAFF TEAM =================
-     New staff add: array me copy-paste karo
-     skin = Minecraft username (avatar auto banega)
-     avatar = (optional) koi bhi image URL */
+  /* ---------- STAFF ----------
+     skin empty = mc-heads avatar automatic */
   staff: [
-    { name: "Anshhu07",  rank: "Owner",    discord: "Anshhu07",  skin: "", avatar: "" },
-    { name: "STAFF_1",   rank: "Co-Owner", discord: "id",        skin: "", avatar: "" },
-    { name: "STAFF_2",   rank: "Admin",    discord: "id",        skin: "", avatar: "" },
-    { name: "STAFF_3",   rank: "Sr.Mod",   discord: "id",        skin: "", avatar: "" },
-    { name: "STAFF_4",   rank: "Mod",      discord: "id",        skin: "", avatar: "" },
-    { name: "STAFF_5",   rank: "Helper",   discord: "id",        skin: "", avatar: "" },
-    // Copy karke aur add karo:
-    // { name: "PlayerName", rank: "Mod", discord: "id", skin: "", avatar: "" },
+    { name: "Anshhu07",  rank: "Owner",   discord: "Anshhu07" },
+    { name: "STAFF_1",   rank: "Admin",   discord: "" },
+    { name: "STAFF_2",   rank: "Sr.Mod",  discord: "" },
+    { name: "STAFF_3",   rank: "Mod",     discord: "" },
+    { name: "STAFF_4",   rank: "Helper",  discord: "" },
+    { name: "STAFF_5",   rank: "Helper",  discord: "" }
   ],
 
-  /* ================= NEWS / UPDATES ================= */
+  /* ---------- NEWS ---------- */
   news: [
-    {
-      date: "03 Sept 2026",
-      tag: "UPDATE",
-      title: "WatterCraft Website v2 Launch!",
-      text: "Naya professional website live — UPI store, boss fights showcase aur naya design. Store ab open hai!",
-    },
-    {
-      date: "02 Sept 2026",
-      tag: "BOSS",
-      title: "New Custom Boss Added",
-      text: "Hypixel map pe naya custom boss spawn hua hai — legendary sword drop karne ka chance. Squad ke saath try karo!",
-    },
-    {
-      date: "01 Sept 2026",
-      tag: "EVENT",
-      title: "Skyblock Season Event",
-      text: "Is weekend double XP + rare minion drops. Discord pe join karo details ke liye.",
-    },
-    // Naya update add karna:
-    // { date: "DD Month YYYY", tag: "UPDATE", title: "...", text: "..." },
+    { date: "SEP 2026", tag: "UPDATE", title: "Season 2 — New Boss Island",
+      desc: "Naya custom boss arena + legendary sword drops live ho gaye." },
+    { date: "SEP 2026", tag: "STORE", title: "UPI Store is LIVE",
+      desc: "Ab GPay/PhonePe/Paytm se ranks aur gems — instant in-game delivery." },
+    { date: "AUG 2026", tag: "EVENT", title: "Skyblock Nights",
+      desc: "Har Friday drop party + double minion speed weekend." }
   ],
 
-  /* ================= VOTE ================= */
+  /* ---------- VOTE ---------- */
   vote: [
-    { name: "MCPE Planets",  url: "https://example.com/vote1" },  // ⚠️ apne links
-    { name: "MCPE Servers",  url: "https://example.com/vote2" },  // ⚠️ apne links
+    { name: "MCPE Planets", url: "https://example.com/vote1" },   // ⚠️ links
+    { name: "MCPE Servers", url: "https://example.com/vote2" }
   ],
-  voteRewards: "Vote karo → 2x rewards + vote crates (VIP/MVP me 3x!)",
 
-  /* ================= RULES ================= */
+  /* ---------- RULES ---------- */
   rules: [
-    "Hacking, X-Ray aur cheats = PERMANENT BAN — koi warning nahi",
-    "Scamming ya dupe exploit = ban + items confiscate",
-    "Respect staff aur players — toxicity tolerate nahi hogi",
-    "Alt accounts se ban bypass karna = main account bhi ban",
-    "Bug milne pe report karo (Discord), exploit mat karo",
-    "Advertising doosre servers ki = ban",
+    "No hacking, x-ray ya unfair mods — instant ban.",
+    "Scam ya real-money trade server ke bahar — ban.",
+    "Respect staff aur players. Toxicity allowed nahi.",
+    "Griefing ya island raids — punishment.",
+    "Bug/exploit use karna ban hai — report karo aur reward pao.",
+    "Duplicating items ya currency — permanent ban."
   ],
 
-  /* ================= DISCORD ================= */
+  /* ---------- DISCORD CTA ---------- */
   discord: {
-    title: "WatterCraft Community",
-    desc: "5,000+ members ka family — updates, events, giveaways, support aur staff help sab yahan milega.",
-  },
+    title: "Join 5,000+ Players on Discord",
+    desc: "Giveaways, staff help, ban appeals, aur community events — sab yahan."
+  }
 };
 
 /* Don't edit below */
