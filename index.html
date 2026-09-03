@@ -3,244 +3,116 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WatterCraft | Bedrock Skyblock Server</title>
-  <meta name="description" content="WatterCraft — India's advanced Bedrock Skyblock server. Custom bosses, minions, deep mining, and a UPI store with instant in-game delivery." />
-  <meta name="theme-color" content="#050b18" />
-  <meta property="og:title" content="WatterCraft — Bedrock Skyblock Server" />
-  <meta property="og:description" content="Join play.wattercraft.fun:19132. Skyblock, custom bosses, minions and a UPI-powered store." />
+  <title>WatterCraft | Minecraft Bedrock SkyBlock</title>
+  <meta name="description" content="WatterCraft is a Minecraft Bedrock SkyBlock server featuring islands, skills, quests, collections, pets, minions, Bazaar, Auction House, Dungeons and more." />
+  <meta name="theme-color" content="#04070f" />
+  <meta property="og:title" content="WatterCraft | Minecraft Bedrock SkyBlock" />
+  <meta property="og:description" content="BUILD. PROGRESS. CONQUER. Join play.wattercraft.fun:19132 — SkyBlock, skills, quests, pets, minions, Bazaar and Dungeons on Bedrock." />
   <meta property="og:type" content="website" />
-  <link rel="icon" type="image/png" href="assets/mark.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://anshuoppp.github.io/WatterCraft-web/" />
+  <!-- Inline favicon (no broken image if assets are missing) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2322d3ee'/%3E%3Ctext x='16' y='23' font-family='Arial' font-size='20' font-weight='900' text-anchor='middle' fill='%2304263a'%3EW%3C/text%3E%3C/svg%3E" />
 
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
+  <!-- Design system (File 2) -->
   <link rel="stylesheet" href="style.css" />
 
+  <!-- Enable JS-only reveal styles (content visible without JS) -->
   <script>document.documentElement.classList.add("js");</script>
 
+  <!-- Optional animation engine; site degrades gracefully without it -->
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 </head>
 <body>
 
-  <div class="loader" id="loader" aria-hidden="true">
-    <div class="loader-card">
-      <div class="loader-mark"><img src="assets/mark.png" alt="" /></div>
-      <div class="loader-bar"><span class="loader-fill" id="loaderFill"></span></div>
-      <p class="loader-status" id="loaderStatus">Loading WatterCraft</p>
-    </div>
-  </div>
+  <!-- Ambient background layers -->
+  <div class="bg-scene" aria-hidden="true"></div>
+  <div class="bg-pixel" id="pixelField" aria-hidden="true"></div>
 
-  <header class="nav" id="nav">
+  <!-- ══════════ NAVBAR ══════════ -->
+  <header class="nav" id="topNav">
     <div class="nav-inner">
-      <a class="logo" href="#home" aria-label="WatterCraft home">
+      <a class="logo" href="#/home" aria-label="WatterCraft home">
         <span class="logo-mark" aria-hidden="true">W</span>
         <span class="logo-name">Watter<em>Craft</em></span>
       </a>
-      <nav class="nav-links" id="navLinks" aria-label="Primary">
-        <a href="#world">World</a>
-        <a href="#modes">Gamemodes</a>
-        <a href="#store">Store</a>
-        <a href="#team">Team</a>
-        <a href="#news">News</a>
-        <a href="#vote">Vote</a>
-        <a href="#rules">Rules</a>
-        <a class="nav-cta" href="#discord">Discord</a>
-      </nav>
-      <button class="burger" id="burger" aria-label="Toggle menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+
+      <nav class="nav-links" id="navLinks" aria-label="Primary"></nav>
+
+      <div class="nav-right">
+        <button class="search-trigger" id="searchOpen" type="button" aria-label="Search">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <span class="txt">Search</span><kbd>Ctrl K</kbd>
+        </button>
+
+        <div class="status-pill" id="serverStatus" role="status" aria-live="polite">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span class="txt">Checking…</span>
+        </div>
+
+        <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <main>
+  <!-- ══════════ MOBILE DRAWER ══════════ -->
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-backdrop" data-close-drawer></div>
+    <nav class="drawer-panel" id="drawerLinks" aria-label="Mobile">
+      <a class="btn btn-discord btn-block drawer-cta" href="#/discord">Join Discord</a>
+    </nav>
+  </div>
 
-    <section class="hero" id="home">
-      <div class="hero-media" id="heroBg"></div>
-      <div class="hero-veil"></div>
-      <div class="hero-glow"></div>
-      <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+  <!-- ══════════ MAIN VIEW (router renders pages here) ══════════ -->
+  <main class="page" id="view" tabindex="-1"></main>
 
-      <div class="hero-content">
-        <p class="hero-kicker" id="heroKicker">Bedrock Skyblock · 24/7 · India</p>
-        <div class="hero-logo" id="heroLogoWrap">
-          <img id="heroLogo" src="assets/logo.png" alt="WatterCraft" />
-        </div>
-        <p class="hero-type"><span id="heroType"></span><span class="caret" aria-hidden="true"></span></p>
-        <button class="ip-box" type="button" onclick="copyIP()" aria-label="Copy server IP">
-          <span class="ip-state" aria-hidden="true"></span>
-          <span class="ip-value" id="ipText">play.wattercraft.fun</span>
-          <span class="ip-copy">Copy</span>
-        </button>
-        <p class="hero-players" id="playersOnline" hidden>
-          <span class="dot" aria-hidden="true"></span>
-          <span id="playersCount">0</span> players online
-        </p>
-        <div class="hero-actions">
-          <button class="btn btn-primary btn-lg" type="button" onclick="copyIP()">▶ Play Now</button>
-          <a class="btn btn-ghost btn-lg" href="#store">View Store</a>
-        </div>
-        <ul class="hero-chips">
-          <li class="chip"><span class="dot" aria-hidden="true"></span>Server Online</li>
-          <li class="chip">Custom Bosses</li>
-          <li class="chip">Minions</li>
-          <li class="chip">UPI Store</li>
-        </ul>
-      </div>
-
-      <figure class="island-frame" id="heroFrame" aria-hidden="true">
-        <img id="heroIsland" src="assets/island.jpg" alt="" />
-        <figcaption class="island-label"><span class="live-dot"></span> Live · Skyblock Island</figcaption>
-      </figure>
-
-      <a class="scroll-cue" href="#world" aria-label="Scroll to content"><span></span></a>
-    </section>
-
-    <div class="ticker" aria-hidden="true">
-      <div class="ticker-track" id="tickerTrack"></div>
-    </div>
-
-    <section class="section stats" id="stats">
-      <div class="container">
-        <div class="stats-grid" id="statsRow"></div>
-      </div>
-    </section>
-
-    <section class="showcase" id="world">
-      <div class="showcase-bg" id="showcaseBg"></div>
-      <div class="showcase-veil"></div>
-      <div class="container">
-        <div class="showcase-card" data-reveal>
-          <p class="kicker" id="showcaseKicker">The World of WatterCraft</p>
-          <h2 class="showcase-title" id="showcaseTitle">One Island. Infinite Possibilities.</h2>
-          <p class="showcase-desc" id="showcaseDesc"></p>
-          <ul class="showcase-points" id="showcasePoints"></ul>
-          <button class="btn btn-primary btn-lg" type="button" onclick="openJoin()">Start Your Island</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="modes">
-      <div class="container">
-        <header class="section-head" data-reveal>
-          <p class="kicker">Gamemodes</p>
-          <h2 class="title">Choose Your Adventure</h2>
-          <p class="sub">Four ways to play — all on our custom Hypixel-style map.</p>
-        </header>
-        <div class="modes-grid" id="modesGrid"></div>
-      </div>
-    </section>
-
-    <section class="section section--alt" id="features">
-      <div class="container">
-        <header class="section-head" data-reveal>
-          <p class="kicker">Why WatterCraft</p>
-          <h2 class="title">Built for Serious Players</h2>
-        </header>
-        <div class="features-grid" id="featuresGrid"></div>
-      </div>
-    </section>
-
-    <section class="section store" id="store">
-      <div class="container">
-        <header class="section-head" data-reveal>
-          <p class="kicker">Store</p>
-          <h2 class="title">Ranks &amp; Gems</h2>
-          <p class="sub" id="storeNote"></p>
-        </header>
-        <div class="store-grid" id="storeGrid"></div>
-        <p class="store-help" id="storeHelp">
-          After payment you receive a unique code — redeem it in-game with
-          <code class="mono">/redeem &lt;code&gt;</code> for instant delivery.
-        </p>
-      </div>
-    </section>
-
-    <section class="section section--alt" id="team">
-      <div class="container">
-        <header class="section-head" data-reveal>
-          <p class="kicker">Staff Team</p>
-          <h2 class="title">Meet the Team</h2>
-          <p class="sub">Led by owner <strong id="teamOwner">Anshhu07</strong> — available around the clock.</p>
-        </header>
-        <div class="team-grid" id="teamGrid"></div>
-      </div>
-    </section>
-
-    <section class="section" id="news">
-      <div class="container narrow">
-        <header class="section-head" data-reveal>
-          <p class="kicker">Updates</p>
-          <h2 class="title">Latest News</h2>
-        </header>
-        <div class="news-list" id="newsList"></div>
-      </div>
-    </section>
-
-    <section class="section section--alt vote" id="vote">
-      <div class="container narrow">
-        <header class="section-head" data-reveal>
-          <p class="kicker">Vote &amp; Earn</p>
-          <h2 class="title">Support the Server</h2>
-          <p class="sub">Vote daily and receive rewards in-game.</p>
-        </header>
-        <div class="vote-grid" id="voteList"></div>
-      </div>
-    </section>
-
-    <section class="section" id="rules">
-      <div class="container narrow">
-        <header class="section-head" data-reveal>
-          <p class="kicker">Guidelines</p>
-          <h2 class="title">Server Rules</h2>
-        </header>
-        <ol class="rules-list" id="rulesList"></ol>
-      </div>
-    </section>
-
-    <section class="discord" id="discord">
-      <div class="container">
-        <div class="discord-card" data-reveal>
-          <span class="discord-icon" aria-hidden="true">💬</span>
-          <h2 class="discord-title" id="discordTitle">Join 5,000+ Players on Discord</h2>
-          <p class="discord-desc" id="discordDesc"></p>
-          <a class="btn btn-discord btn-lg" id="discordBtn" href="#">Join the Discord</a>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="footer">
+  <!-- ══════════ FOOTER ══════════ -->
+  <footer class="site-footer">
     <div class="container">
-      <div class="footer-brand">
-        <span class="logo-mark" aria-hidden="true">W</span>
-        <span class="logo-name">Watter<em>Craft</em></span>
-      </div>
-      <button class="footer-ip mono" type="button" onclick="copyIP()">play.wattercraft.fun : 19132</button>
-      <p class="footer-note">Not affiliated with Mojang or Microsoft. Minecraft is a trademark of Mojang AB.</p>
-      <p class="footer-copy">© <span id="year"></span> WatterCraft · Owner <span id="ownerName"></span></p>
+      <div class="foot-grid" id="footerBox"></div>
+      <p class="foot-note" id="footNote"></p>
     </div>
   </footer>
 
-  <div class="modal" id="joinModal" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <button class="modal-close" type="button" onclick="closeJoin()" aria-label="Close">×</button>
-      <h3 class="modal-title">Join WatterCraft</h3>
-      <p class="modal-sub">In Minecraft Bedrock Edition:</p>
-      <p class="modal-ip mono" id="joinIp">play.wattercraft.fun</p>
-      <p class="modal-meta">Port <span class="mono" id="joinPort">19132</span> · <span id="joinVersions">Bedrock 1.20+</span></p>
-      <button class="btn btn-primary btn-block" type="button" onclick="copyIP()">Copy IP</button>
-    </div>
-  </div>
-
-  <div class="modal" id="buyModal" role="dialog" aria-modal="true">
+  <!-- ══════════ BUY MODAL ══════════ -->
+  <div class="modal" id="buyModal" role="dialog" aria-modal="true" aria-labelledby="buyTitle">
+    <div class="modal-backdrop" data-close-modal="buyModal"></div>
     <div class="modal-card" id="buyBox"></div>
   </div>
 
+  <!-- ══════════ SEARCH MODAL ══════════ -->
+  <div class="modal" id="searchModal" role="dialog" aria-modal="true" aria-label="Search WatterCraft">
+    <div class="modal-backdrop" data-close-modal="searchModal"></div>
+    <div class="modal-card" style="padding:22px;">
+      <button class="modal-close" type="button" data-close-modal="searchModal" aria-label="Close search">&times;</button>
+      <h3 class="mt-0" style="font-size:1.1rem;margin-bottom:14px;">Search</h3>
+      <input class="field" id="searchInput" type="search" placeholder="Items, guides, wiki, staff…" autocomplete="off" />
+      <div class="search-results" id="searchResults"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- No-JS fallback -->
+  <noscript>
+    <div style="max-width:640px;margin:90px auto;padding:0 20px;text-align:center;color:#a9b8cf;font-family:sans-serif;">
+      <h1 style="color:#fff;">WatterCraft</h1>
+      <p>Please enable JavaScript to view the full website.</p>
+      <p style="margin-top:14px;">Server IP: <b>play.wattercraft.fun</b> port <b>19132</b></p>
+    </div>
+  </noscript>
+
+  <!-- Engine -->
   <script src="data.js"></script>
   <script src="main.js"></script>
-  <script src="enhance.js"></script>
 </body>
 </html>
