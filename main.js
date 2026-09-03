@@ -1,460 +1,815 @@
-/* ============================================================
-   WATTERCRAFT OFFICIAL — LOGIC V3 (Cinematic Engine)
-   Loader • Typewriter • Particles • Counters • Tilt
-   Parallax • Reveal • Store Checkout (UPI)
-   ============================================================ */
+/**
+ * WatterCraft — Site Engine (V4)
+ * Renders all content from data.js, drives animations and the store checkout.
+ * GSAP + ScrollTrigger are optional enhancements; the site degrades gracefully.
+ */
 (function () {
   "use strict";
-  const D = window.WC;
-  if (!D) { console.error("data.js (V3) missing!"); return; }
 
-  const $ = (s) => document.querySelector(s);
-  const $$ = (s) => document.querySelectorAll(s);
-  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const CFG = window.WC;
+  if (!CFG) {
+    console.error("[WatterCraft] data.js is missing or failed to load.");
+    return;
+  }
 
-  /* small extra styles (fallbacks + toast) */
-  const extra = document.createElement("style");
-  extra.textContent =
-    ".hero-fallback{font-family:'Orbitron',sans-serif;font-weight:900;" +
-    "font-size:clamp(2.4rem,8vw,5rem);margin:0;text-shadow:0 0 40px rgba(34,211,238,.5)}" +
-    ".hero-fallback em{font-style:normal;background:linear-gradient(90deg,#22d3ee,#2563eb);" +
-    "-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}" +
-    ".toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);" +
-    "z-index:500;background:rgba(6,16,32,.95);border:1px solid rgba(74,222,128,.5);color:#d7ffe8;" +
-    "padding:12px 22px;border-radius:12px;font-weight:700;letter-spacing:.5px;transition:.4s;" +
-    "box-shadow:0 10px 40px rgba(0,0,0,.5)}.toast.show{transform:translateX(-50%) translateY(0)}" +
+  /* ------------------------------------------------------------------ */
+  /* Helpers                                                            */
+  /* ------------------------------------------------------------------ */
+  const $ = (sel, root) => (root || document).querySelector(sel);
+  const $$ = (sel, root) => Array.prototype.slice.call((root || document).querySelectorAll(sel));
+  const esc = (s) =>
+    String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hasGSAP = typeof window.gsap !== "undefined" && typeof window.ScrollTrigger !== "undefined";
+  if (hasGSAP) {
+    window.gsap.registerPlugin(window.ScrollTrigger);
+    // Neutralise CSS reveal states; GSAP controls them from here on.
+    const reset = document.createElement("style");
+    reset.textContent =
+      "html.gsap [data-reveal]{opacity:1!important;transform:none!important;transition:none!important}";
+    document.documentElement.classList.add("gsap");
+    document.head.appendChild(reset);
+  }
+
+  /* Small helper styles (fallbacks + toast) */
+  const extraCss = document.createElement("style");
+  extraCss.textContent =
+    ".hero-logo-fallback{font-family:'Orbitron',sans-serif;font-weight:900;" +
+    "font-size:clamp(2.6rem,9vw,5.4rem);background:linear-gradient(90deg,#22d3ee,#2563eb);" +
+    "-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;" +
+    "filter:drop-shadow(0 0 40px rgba(34,211,238,.45))}" +
     ".store-help a{color:#22d3ee;text-decoration:underline}";
-  document.head.appendChild(extra);
+  document.head.appendChild(extraCss);
 
-  /* ================= 1. PRELOADER ================= */
-  const loader = $("#loader"), fill = $("#loaderFill");
-  let pct = 0, loaderDone = false;
-  const pre = D.preloader || {};
-  if ($("#loaderText")) $("#loaderText").textContent = pre.text || "LOADING WATTERCRAFT";
-  if ($("#loaderSub")) $("#loaderSub").textContent = pre.sub || "";
+  /* ------------------------------------------------------------------ */
+  /* Preloader                                                          */
+  /* ------------------------------------------------------------------ */
+  const loader = $("#loader");
+  const loaderFill = $("#loaderFill");
+  const loaderStatus = $("#loaderStatus");
 
-  const tick = setInterval(() => {
-    pct = Math.min(100, pct + Math.random() * 16 + 6);
-    if (fill) fill.style.width = pct + "%";
+  let pct = 0;
+  let loaderDone = false;
+
+  function finishLoader() {
+    if (loaderDone) return;
+    loaderDone = true;
+    if (loader) loader.classList.add("is-done");
+    document.body.style.overflow = "";
+    startHeroSequence();
+  }
+
+  // Safety net: the loader can never trap the page.
+  setTimeout(finishLoader, 3000);
+
+  const progress = setInterval(function () {
+    pct = Math.min(100, pct + Math.random() * 15 + 6);
+    if (loaderFill) loaderFill.style.width = pct + "%";
     if (pct >= 100) {
-      clearInterval(tick);
-      setTimeout(() => { loader.classList.add("done"); loaderDone = true; startHero(); }, 350);
+      clearInterval(progress);
+      setTimeout(finishLoader, 260);
     }
-  }, 120);
-  setTimeout(() => { if (!loaderDone && pct < 100) pct = 100; }, 6000); // safety
+  }, 110);
 
-  let heroStarted = false;
-  function startHero() {
-    if (heroStarted) return; heroStarted = true;
-    typewriter();
-    buildHeroParallax();
+  /* ------------------------------------------------------------------ */
+  /* Backgrounds & imagery                                              */
+  /* ------------------------------------------------------------------ */
+  function applyBackground(el, url) {
+    if (!el || !url) return;
+    const probe = new Image();
+    probe.onload = function () {
+      el.style.backgroundImage = 'url("' + url + '")';
+      el.classList.add("is-live");
+    };
+    probe.onerror = function () {
+      el.style.background = "linear-gradient(165deg,#0c2a50 0%,#050b18 60%)";
+    };
+    probe.src = url;
   }
 
-  /* ================= 2. HERO BACKGROUND (lobby, ken burns) ================= */
-  const heroBg = $("#heroBg");
-  const H = D.hero || {};
-  function setBg(el, url) {
-    if (!el) return;
-    const img = new Image();
-    img.onload = () => { el.style.backgroundImage = "url('" + url + "')"; el.classList.add("ken"); };
-    img.onerror = () => { el.style.backgroundImage = "radial-gradient(120% 90% at 60% 10%, #0d2c55 0%, #050d1f 55%, #030812 100%)"; };
-    img.src = url;
-  }
-  if (H.bg) setBg(heroBg, H.bg);
-  if (H.bg && !heroBg.style.backgroundImage) heroBg.style.backgroundImage = "linear-gradient(160deg,#0a2547,#030812)";
+  applyBackground($("#heroBg"), CFG.hero && CFG.hero.background);
+  applyBackground($("#showcaseBg"), CFG.showcase && CFG.showcase.image);
 
-  /* logo */
-  const logoImg = $("#heroLogoImg");
-  const wrap = $("#heroLogoWrap");
-  const B = D.brand || {};
-  if (B.logo && logoImg) {
-    logoImg.onerror = () => {
-      if (wrap) wrap.innerHTML = '<h1 class="hero-fallback">Watter<em>Craft</em></h1>';
+  // Hero logo with graceful text fallback.
+  const heroLogo = $("#heroLogo");
+  const heroLogoWrap = $("#heroLogoWrap");
+  if (heroLogo) {
+    heroLogo.onerror = function () {
+      if (heroLogoWrap) {
+        heroLogoWrap.innerHTML = '<h1 class="hero-logo-fallback">Watter<em>Craft</em></h1>';
+      }
     };
   }
-  if (B.mark) {
-    const mk = document.querySelector(".loader-mark img");
-    if (mk) mk.onerror = () => { mk.remove(); };
+
+  // Remove a broken preloader mark icon.
+  const markImg = $(".loader-mark img");
+  if (markImg) markImg.onerror = function () { markImg.remove(); };
+
+  // Hide the island frame if its image is missing.
+  const islandImg = $("#heroIsland");
+  if (islandImg) {
+    islandImg.onerror = function () {
+      const frame = $("#heroFrame");
+      if (frame) frame.style.display = "none";
+    };
   }
 
-  /* floating island frame */
-  const frameImg = $("#heroFrameImg");
-  if (frameImg && H.islandImg) {
-    frameImg.onerror = () => { const f = $("#heroFrame"); if (f) f.style.display = "none"; };
-  }
+  /* ------------------------------------------------------------------ */
+  /* Static text bindings                                               */
+  /* ------------------------------------------------------------------ */
+  const server = CFG.server || {};
+  const heroCfg = CFG.hero || {};
 
-  /* ================= 3. PARTICLES (floating blocks) ================= */
-  const canvas = $("#heroCanvas");
-  if (canvas && canvas.getContext) {
-    const ctx = canvas.getContext("2d");
-    let W, Hh, parts = [], raf;
-    function size() {
-      W = canvas.width = canvas.offsetWidth;
-      Hh = canvas.height = canvas.offsetHeight;
-      const n = Math.min(70, Math.floor(W / 16));
-      parts = [];
-      for (let i = 0; i < n; i++) parts.push({
-        x: Math.random() * W, y: Math.random() * Hh,
-        s: 1.5 + Math.random() * 3,
-        vy: .15 + Math.random() * .45,
-        vx: (Math.random() - .5) * .2,
-        a: .05 + Math.random() * .25,
-        c: Math.random() > .6 ? "255,255,255" : "34,211,238",
-        p: Math.random() > .82
-      });
+  if ($("#heroKicker") && heroCfg.kicker) $("#heroKicker").textContent = heroCfg.kicker;
+
+  const ipTargets = ["#ipText", "#joinIp"];
+  ipTargets.forEach(function (sel) {
+    const el = $(sel);
+    if (el && server.ip) el.textContent = server.ip;
+  });
+  if ($("#joinPort") && server.port) $("#joinPort").textContent = server.port;
+  if ($("#joinVersions") && server.platform) $("#joinVersions").textContent = server.platform;
+  if ($("#year")) $("#year").textContent = new Date().getFullYear();
+  if ($("#ownerName")) $("#ownerName").textContent = server.owner || "";
+  if ($("#teamOwner")) $("#teamOwner").textContent = server.owner || "";
+
+  const footerIp = $(".footer-ip");
+  if (footerIp && server.ip) footerIp.textContent = server.ip + " : " + (server.port || "");
+
+  if ($("#discordBtn") && server.discord) $("#discordBtn").href = server.discord;
+  const discord = CFG.discord || {};
+  if ($("#discordTitle") && discord.title) $("#discordTitle").textContent = discord.title;
+  if ($("#discordDesc") && discord.description) $("#discordDesc").textContent = discord.description;
+  if ($("#discordBtn") && discord.cta) $("#discordBtn").textContent = discord.cta;
+
+  /* ------------------------------------------------------------------ */
+  /* Live player count (Bedrock via mcsrvstat)                          */
+  /* ------------------------------------------------------------------ */
+  function initPlayerCount() {
+    const pill = $("#playersOnline");
+    const countEl = $("#playersCount");
+    if (!pill || !countEl || !server.statusHost) return;
+
+    const endpoint =
+      "https://api.mcsrvstat.us/bedrock/2/" +
+      encodeURIComponent(server.statusHost) +
+      ":" + (server.port || 19132);
+
+    function refresh() {
+      fetch(endpoint)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data && data.online && typeof data.players !== "undefined" && data.players !== null) {
+            countEl.textContent = data.players.online || 0;
+            pill.hidden = false;
+          } else {
+            pill.hidden = true;
+          }
+        })
+        .catch(function () { pill.hidden = true; });
     }
-    function draw() {
-      ctx.clearRect(0, 0, W, Hh);
-      for (const pt of parts) {
-        pt.y -= pt.vy; pt.x += pt.vx + Math.sin((pt.y + pt.x) / 60) * .12;
-        if (pt.y < -10) { pt.y = Hh + 10; pt.x = Math.random() * W; }
-        if (pt.x < -10) pt.x = W + 10; if (pt.x > W + 10) pt.x = -10;
-        ctx.globalAlpha = pt.a;
-        ctx.fillStyle = "rgba(" + pt.c + ",1)";
-        ctx.fillRect(pt.x, pt.y, pt.s, pt.s);
-        if (pt.p) {
-          ctx.globalAlpha = pt.a * .5;
-          ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.s * 3.4, 0, 6.283); ctx.fillStyle = "rgba(" + pt.c + ",.5)"; ctx.fill();
-        }
-      }
-      raf = requestAnimationFrame(draw);
-    }
-    size(); draw();
-    window.addEventListener("resize", () => { cancelAnimationFrame(raf); size(); draw(); });
-  }
 
-  /* ================= 4. TYPEWRITER ================= */
-  const typeEl = $("#heroType");
-  function typewriter() {
-    if (!typeEl || !H.taglines || !H.taglines.length) return;
-    const lines = H.taglines;
-    let li = 0, ci = 0, del = false;
-    (function step() {
-      const line = lines[li];
-      typeEl.textContent = line.slice(0, ci);
-      let wait = del ? 34 : 58;
-      if (!del && ci === line.length) { wait = 1700; del = true; }
-      else if (del && ci === 0) { del = false; li = (li + 1) % lines.length; wait = 350; }
-      ci += del ? -1 : 1;
-      setTimeout(step, wait);
-    })();
+    refresh();
+    setInterval(refresh, 60000);
   }
+  initPlayerCount();
 
-  /* ================= 5. SERVER INFO ================= */
-  const S = D.server || {};
-  if (S.ip) { const ips = $$("#ipText, #joinIp, .footer-ip"); ips.forEach((e) => e && (e.textContent = S.ip)); }
-  if (S.port && $("#joinPort")) $("#joinPort").textContent = S.port;
-  if (S.versions && $("#joinVersions")) $("#joinVersions").textContent = S.versions;
-  if (S.discord) {
-    if ($("#navDiscord")) $("#navDiscord").href = S.discord;
-    if ($("#discordBtn")) $("#discordBtn").href = S.discord;
-  }
-  if (S.owner) { if ($("#staffOwner")) $("#staffOwner").textContent = S.owner; if ($("#footerOwner")) $("#footerOwner").textContent = S.owner; }
-  if ($("#footerYear")) $("#footerYear").textContent = new Date().getFullYear();
-
-  /* ================= 6. MARQUEE TICKER ================= */
+  /* ------------------------------------------------------------------ */
+  /* Ticker (seamless loop)                                             */
+  /* ------------------------------------------------------------------ */
   const track = $("#tickerTrack");
-  if (track && D.marquee && D.marquee.length) {
-    const seq = D.marquee.map((m) => '<span class="tick">' + esc(m) + "</span>").join("");
-    track.innerHTML = seq + seq; // duplicate for seamless -50% loop
+  if (track && CFG.ticker && CFG.ticker.length) {
+    const seq = CFG.ticker.map(function (t) { return '<span class="tick">' + esc(t) + "</span>"; }).join("");
+    track.innerHTML = seq + seq;
   }
 
-  /* ================= 7. ANIMATED COUNTERS ================= */
-  function animateCount(el, end, suffix, dur) {
-    const t0 = performance.now();
-    (function step(t) {
-      const k = Math.min(1, (t - t0) / dur);
-      const ease = 1 - Math.pow(1 - k, 3);
-      el.textContent = Math.round(end * ease).toLocaleString("en-IN") + (suffix || "");
-      if (k < 1) requestAnimationFrame(step);
-    })(t0);
+  /* ------------------------------------------------------------------ */
+  /* Counters                                                           */
+  /* ------------------------------------------------------------------ */
+  function runCounter(el, end, suffix, duration) {
+    const start = performance.now();
+    function frame(now) {
+      const k = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(end * eased).toLocaleString("en-IN") + (suffix || "");
+      if (k < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
   }
+
+  function observeCounters() {
+    const values = $$("[data-count]");
+    if (!values.length) return;
+
+    if (hasGSAP && !reduceMotion) {
+      values.forEach(function (el) {
+        window.gsap.to({ v: 0 }, {
+          v: parseFloat(el.dataset.count),
+          duration: 1.6,
+          ease: "power2.out",
+          scrollTrigger: { trigger: el, start: "top 88%", once: true },
+          onUpdate: function () {
+            el.textContent = Math.round(this.targets()[0].v).toLocaleString("en-IN") + (el.dataset.suffix || "");
+          }
+        });
+      });
+      return;
+    }
+
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          runCounter(en.target, parseFloat(en.target.dataset.count), en.target.dataset.suffix || "", 1500);
+          io.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    values.forEach(function (el) { io.observe(el); });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Stats                                                              */
+  /* ------------------------------------------------------------------ */
   const statsRow = $("#statsRow");
-  if (statsRow && D.stats) {
-    statsRow.innerHTML = D.stats.map((s, i) =>
-      '<div class="stat-item reveal" data-dir="zoom" style="transition-delay:' + (i * 90) + 'ms">' +
-      '<div class="stat-value" data-count="' + s.value + '" data-suffix="' + esc(s.suffix || "") + '">0</div>' +
-      '<div class="stat-label">' + esc(s.label) + "</div></div>").join("");
-  }
-
-  /* ================= 8. FEATURED WORLD (parallax) ================= */
-  const fBg = $("#featuredBg"), F = D.featured || {};
-  if (fBg && F.img) setBg(fBg, F.img);
-  else if (fBg) fBg.style.background = "linear-gradient(160deg,#0b2a52,#030812)";
-  if (F.kicker && $("#featuredKicker")) $("#featuredKicker").textContent = F.kicker;
-  if (F.title && $("#featuredTitle")) $("#featuredTitle").textContent = F.title;
-  if (F.desc && $("#featuredDesc")) $("#featuredDesc").textContent = F.desc;
-  if ($("#featuredPoints") && F.points) {
-    $("#featuredPoints").innerHTML = F.points.map((p) => "<li>" + esc(p) + "</li>").join("");
-  }
-
-  /* ================= 9. GAMEMODES ================= */
-  const modesGrid = $("#modesGrid");
-  if (modesGrid && D.gamemodes) {
-    modesGrid.innerHTML = D.gamemodes.map((m, i) => {
-      const media = m.img
-        ? '<div class="mode-media"><img src="' + esc(m.img) + '" alt="' + esc(m.title) + '" loading="lazy"></div>'
-        : '<div class="mode-media art"><div class="mode-art">' + (m.icon || "🎮") + "</div></div>";
-      return '<article class="mode-card reveal" style="transition-delay:' + (i * 80) + 'ms">' +
-        media + '<span class="mode-tag">' + esc(m.tag || "MODE") + "</span>" +
-        '<div class="mode-body"><h3 class="mode-title">' + esc(m.title) + "</h3>" +
-        '<p class="mode-desc">' + esc(m.desc) + "</p></div></article>";
+  if (statsRow && CFG.stats) {
+    statsRow.innerHTML = CFG.stats.map(function (s, i) {
+      return (
+        '<div class="stat" data-reveal="zoom" style="--rd:' + (i * 90) + 'ms">' +
+        '<div class="stat-value" data-count="' + s.value + '" data-suffix="' + esc(s.suffix || "") + '">0</div>' +
+        '<div class="stat-label">' + esc(s.label) + "</div></div>"
+      );
     }).join("");
   }
 
-  /* ================= 10. FEATURES ================= */
-  const featGrid = $("#featuresGrid");
-  if (featGrid && D.features) {
-    featGrid.innerHTML = D.features.map((f, i) =>
-      '<div class="feature-card reveal" style="transition-delay:' + (i * 80) + 'ms">' +
-      '<span class="feature-ico">' + (f.icon || "✨") + "</span>" +
-      '<h3 class="feature-title">' + esc(f.title) + "</h3>" +
-      '<p class="feature-desc">' + esc(f.desc) + "</p></div>").join("");
+  /* ------------------------------------------------------------------ */
+  /* Showcase                                                           */
+  /* ------------------------------------------------------------------ */
+  const showcase = CFG.showcase || {};
+  if ($("#showcaseKicker") && showcase.kicker) $("#showcaseKicker").textContent = showcase.kicker;
+  if ($("#showcaseTitle") && showcase.title) $("#showcaseTitle").textContent = showcase.title;
+  if ($("#showcaseDesc") && showcase.description) $("#showcaseDesc").textContent = showcase.description;
+  const showcasePoints = $("#showcasePoints");
+  if (showcasePoints && showcase.points) {
+    showcasePoints.innerHTML = showcase.points.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("");
+  }
+  const showcaseCta = $(".showcase-card .btn");
+  if (showcaseCta && showcase.cta) showcaseCta.textContent = showcase.cta;
+
+  /* ------------------------------------------------------------------ */
+  /* Gamemodes                                                          */
+  /* ------------------------------------------------------------------ */
+  const modesGrid = $("#modesGrid");
+  if (modesGrid && CFG.gameModes) {
+    modesGrid.innerHTML = CFG.gameModes.map(function (m, i) {
+      const media = m.image
+        ? '<div class="mode-media"><img src="' + esc(m.image) + '" alt="' + esc(m.name) + '" loading="lazy"></div>'
+        : '<div class="mode-media"><span class="mode-icon">⚔</span></div>';
+      return (
+        '<article class="mode-card" data-reveal style="--rd:' + (i * 90) + 'ms">' +
+        media +
+        '<div class="mode-body">' +
+        '<span class="mode-tag">' + esc(m.tag || "MODE") + "</span>" +
+        '<h3 class="mode-name">' + esc(m.name) + "</h3>" +
+        '<p class="mode-desc">' + esc(m.desc) + "</p>" +
+        "</div></article>"
+      );
+    }).join("");
   }
 
-  /* ================= 11. STORE ================= */
-  const storeGrid = $("#storeGrid");
-  const storeApi = (D.store && D.store.api) || "";
-  const storeReady = storeApi && storeApi.indexOf("YOURUSER") === -1;
+  /* ------------------------------------------------------------------ */
+  /* Features                                                           */
+  /* ------------------------------------------------------------------ */
+  const featuresGrid = $("#featuresGrid");
+  if (featuresGrid && CFG.features) {
+    featuresGrid.innerHTML = CFG.features.map(function (f, i) {
+      return (
+        '<div class="feature" data-reveal style="--rd:' + (i * 90) + 'ms">' +
+        '<span class="feature-icon">◆</span>' +
+        '<h3 class="feature-title">' + esc(f.title) + "</h3>" +
+        '<p class="feature-desc">' + esc(f.desc) + "</p></div>"
+      );
+    }).join("");
+  }
 
-  function openBuy(pkg) {
+  /* ------------------------------------------------------------------ */
+  /* Store                                                              */
+  /* ------------------------------------------------------------------ */
+  const store = CFG.store || {};
+  const storeApi = store.api || "";
+  const currency = store.currency || "₹";
+  const storeReady = !!storeApi;
+
+  const storeGrid = $("#storeGrid");
+  if (storeGrid && store.packages) {
+    storeGrid.innerHTML = store.packages.map(function (p, i) {
+      return (
+        '<div class="package-card" style="--c:' + esc(p.color || "#22d3ee") + '" data-reveal style="--rd:' + (i * 90) + 'ms">' +
+        (p.badge ? '<span class="package-badge">' + esc(p.badge) + "</span>" : "") +
+        '<div class="package-icon">◆</div>' +
+        '<h3 class="package-name">' + esc(p.name) + "</h3>" +
+        '<div class="package-price">' + esc(currency) + esc(p.price) + "</div>" +
+        '<ul class="package-perks">' + p.perks.map(function (k) { return "<li>" + esc(k) + "</li>"; }).join("") + "</ul>" +
+        '<button class="package-buy" type="button" data-buy="' + esc(p.id) + '">Buy Now</button>' +
+        "</div>"
+      );
+    }).join("");
+
+    storeGrid.addEventListener("click", function (e) {
+      const btn = e.target.closest("[data-buy]");
+      if (!btn) return;
+      const pkg = store.packages.find(function (p) { return p.id === btn.dataset.buy; });
+      if (pkg) openBuyModal(pkg);
+    });
+  }
+
+  if ($("#storeNote") && store.paymentNote) $("#storeNote").textContent = store.paymentNote;
+  const storeHelp = $("#storeHelp");
+  if (storeHelp && !storeReady) {
+    const a = document.createElement("a");
+    a.href = server.discord || "#discord";
+    a.textContent = " Payment gateway is being connected — ask in Discord.";
+    storeHelp.appendChild(a);
+  }
+
+  /* Checkout */
+  function openModal(id) {
+    const m = $("#" + id);
+    if (!m) return;
+    m.classList.add("is-open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeModal(id) {
+    const m = $("#" + id);
+    if (!m) return;
+    m.classList.remove("is-open");
+    if (!$$(".modal.is-open").length) document.body.style.overflow = "";
+  }
+
+  function openBuyModal(pkg) {
     const box = $("#buyBox");
     if (!box) return;
     box.innerHTML =
-      '<button class="modal-x" onclick="closeBuy()">✕</button>' +
-      '<div class="buy-summary reveal in"><span class="pkg-ico">' + (pkg.icon || "🎁") + "</span>" +
-      '<div><div class="bs-name">' + esc(pkg.name) + "</div>" +
-      '<div class="bs-price">₹' + esc(pkg.price) + " &nbsp;UPI</div></div></div>" +
-      "<ul class='pkg-perks' style='margin-top:14px'>" + pkg.perks.map((p) => "<li>" + esc(p) + "</li>").join("") + "</ul>" +
-      "<label for='buyUser'>Your Minecraft Username</label>" +
-      '<input class="field" id="buyUser" placeholder="e.g. Anshhu07" autocomplete="off" />' +
-      '<p class="upi-note">Pay via <b>GPay • PhonePe • Paytm</b> — payment ke baad unique code milega</p>' +
-      '<button class="btn btn-primary btn-block" id="payBtn">💳 Pay ₹' + esc(pkg.price) + " via UPI</button>" +
-      '<div id="payMsg" class="loading-msg" style="display:none"></div>';
+      '<button class="modal-close" type="button" onclick="closeBuy()" aria-label="Close">×</button>' +
+      '<div class="buy-summary">' +
+      '<span class="bs-icon">◆</span>' +
+      "<div><div class='bs-name'>" + esc(pkg.name) + "</div>" +
+      "<div class='bs-price'>" + esc(currency) + esc(pkg.price) + " · UPI</div></div></div>" +
+      '<ul class="package-perks" style="text-align:left;margin:16px auto 0;max-width:280px">' +
+      pkg.perks.map(function (k) { return "<li>" + esc(k) + "</li>"; }).join("") + "</ul>" +
+      '<label class="form-label" for="buyUser">Minecraft Username</label>' +
+      '<input class="field" id="buyUser" placeholder="Your in-game name" autocomplete="off" />' +
+      '<p class="upi-note">Pay with <strong>GPay · PhonePe · Paytm</strong>. Your unique code appears here after payment.</p>' +
+      '<button class="btn btn-primary btn-block" type="button" id="payBtn">Pay ' + esc(currency) + esc(pkg.price) + " via UPI</button>" +
+      '<div class="status" id="payStatus" hidden></div>';
+
     openModal("buyModal");
-    const payBtn = $("#payBtn"), msg = $("#payMsg");
-    payBtn.addEventListener("click", () => pay(pkg));
+
     const input = $("#buyUser");
-    input.focus();
-    input.addEventListener("keydown", (e) => { if (e.key === "Enter") pay(pkg); });
+    if (input) {
+      input.focus();
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") startPayment(pkg); });
+    }
+    const payBtn = $("#payBtn");
+    if (payBtn) payBtn.addEventListener("click", function () { startPayment(pkg); });
   }
 
-  async function pay(pkg) {
-    const user = ($("#buyUser") || {}).value || "";
-    const msg = $("#payMsg");
-    if (user.trim().length < 3) {
-      if (msg) { msg.style.display = "block"; msg.className = "err-msg"; msg.textContent = "⚠️ Sahi Minecraft username daalo (min 3 letters)."; }
+  function setStatus(type, text) {
+    const el = $("#payStatus");
+    if (!el) return;
+    el.hidden = false;
+    el.className = "status status--" + type;
+    el.innerHTML = text;
+  }
+
+  function startPayment(pkg) {
+    const input = $("#buyUser");
+    const user = input ? input.value.trim() : "";
+
+    if (user.length < 3) {
+      setStatus("error", "Enter a valid Minecraft username (3+ characters).");
       return;
     }
     if (!storeReady) {
-      if (msg) { msg.style.display = "block"; msg.className = "err-msg";
-        msg.innerHTML = "⚠️ Store engine abhi connected nahi hai. Cloudflare Worker deploy karke data.js me store.api update karo — steps ke liye mujhse pucho."; }
+      setStatus("error", "The store is not connected yet. Ask in Discord and try again soon.");
       return;
     }
-    if (msg) { msg.style.display = "block"; msg.className = "loading-msg"; msg.textContent = "⏳ Razorpay payment link ban raha hai..."; }
-    const payBtn = $("#payBtn"); if (payBtn) payBtn.disabled = true;
-    try {
-      const res = await fetch(storeApi + "/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ package: pkg.id, player: user.trim(), platform: "bedrock" })
+
+    const payBtn = $("#payBtn");
+    if (payBtn) payBtn.disabled = true;
+    setStatus("loading", "Creating your secure payment link…");
+
+    fetch(storeApi + "/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ package: pkg.id, player: user, platform: "bedrock" })
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data && data.url) {
+          setStatus("loading", "Payment window opened — complete the payment, your code will appear here.");
+          window.open(data.url, "_blank");
+          pollOrder(data.order);
+        } else if (data && data.error) {
+          setStatus("error", esc(data.error));
+        } else {
+          setStatus("error", "Unexpected response from the store service.");
+        }
+        if (payBtn) setTimeout(function () { payBtn.disabled = false; }, 2000);
+      })
+      .catch(function () {
+        setStatus("error", "Network error — please try again.");
+        if (payBtn) payBtn.disabled = false;
       });
-      const data = await res.json();
-      if (data && data.url) {
-        if (msg) msg.textContent = "✅ Payment page khul raha hai... pay karo, phir yahi code milega.";
-        window.open(data.url, "_blank");
-        pollCode(data.order);
-      } else if (data && data.error) {
-        if (msg) { msg.className = "err-msg"; msg.textContent = "⚠️ " + data.error; }
-      } else {
-        if (msg) { msg.className = "err-msg"; msg.textContent = "⚠️ Worker se galat response aaya — order check karo."; }
-      }
-    } catch (e) {
-      if (msg) { msg.className = "err-msg"; msg.textContent = "⚠️ Network error — Worker URL sahi hai? (" + esc(storeApi) + ")"; }
-    }
-    if (payBtn) setTimeout(() => { payBtn.disabled = false; }, 2500);
   }
 
-  function pollCode(order) {
-    const box = $("#buyBox"), msg = $("#payMsg");
-    let tries = 0;
-    const iv = setInterval(async () => {
-      tries++;
-      if (tries > 40) { clearInterval(iv); if (msg) { msg.className = "err-msg"; msg.textContent = "⏰ Timeout — payment hua to /redeem wala code Discord pe maango ya dobara buy karo."; } return; }
-      try {
-        const res = await fetch(storeApi + "/api/status?order=" + encodeURIComponent(order));
-        const d = await res.json();
-        if (d && d.paid && d.code) {
-          clearInterval(iv);
-          if (msg) msg.style.display = "none";
-          box.insertAdjacentHTML("beforeend",
-            '<div class="code-result"><div class="code-label">✅ PAYMENT CONFIRMED — YOUR CODE</div>' +
-            '<div class="code-val">' + esc(d.code) + "</div>" +
-            '<button class="btn btn-sm" id="copyCode" style="background:linear-gradient(135deg,#4ade80,#16a34a);color:#042">📋 Copy Code</button>' +
-            '<p style="font-size:.8rem;color:#9fceb4;margin-top:10px">Game me likho: <b class="mono">/redeem ' + esc(d.code) + "</b></p></div>");
-          const cc = $("#copyCode");
-          if (cc) cc.onclick = () => copyText(d.code);
-        } else if (d && d.error) {
-          clearInterval(iv);
-          if (msg) { msg.className = "err-msg"; msg.textContent = "⚠️ " + d.error; }
-        }
-        // not paid yet → continue polling
-      } catch (e) { /* retry */ }
+  function pollOrder(order) {
+    if (!order) return;
+    const box = $("#buyBox");
+    let attempts = 0;
+    const timer = setInterval(function () {
+      attempts += 1;
+      if (attempts > 40) {
+        clearInterval(timer);
+        setStatus("error", "Timed out. If payment succeeded, contact staff on Discord for your code.");
+        return;
+      }
+      fetch(storeApi + "/api/status?order=" + encodeURIComponent(order))
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d && d.paid && d.code) {
+            clearInterval(timer);
+            const status = $("#payStatus");
+            if (status) status.hidden = true;
+            box.insertAdjacentHTML("beforeend",
+              '<div class="code-reveal">' +
+              '<div class="code-label">Payment confirmed — your code</div>' +
+              '<div class="code-value">' + esc(d.code) + "</div>" +
+              '<button class="btn" type="button" id="copyCode">Copy Code</button>' +
+              '<p style="font-size:.8rem;color:#9fceb4;margin-top:12px">Redeem in-game with <code class="mono">/redeem ' + esc(d.code) + "</code></p>" +
+              "</div>");
+            const copyBtn = $("#copyCode");
+            if (copyBtn) copyBtn.addEventListener("click", function () { copyText(d.code); });
+          } else if (d && d.error) {
+            clearInterval(timer);
+            setStatus("error", esc(d.error));
+          }
+        })
+        .catch(function () { /* not paid yet — keep polling */ });
     }, 3000);
   }
 
-  if (storeGrid && D.store && D.store.packages) {
-    storeGrid.innerHTML = D.store.packages.map((p, i) =>
-      '<div class="pkg-card reveal" style="--c:' + esc(p.color || "#22d3ee") + ";transition-delay:" + (i * 90) + 'ms">' +
-      (p.tag ? '<span class="pkg-tag">' + esc(p.tag) + "</span>" : "") +
-      '<div class="pkg-ico">' + (p.icon || "🎁") + "</div>" +
-      '<div class="pkg-name">' + esc(p.name) + "</div>" +
-      '<div class="pkg-price">₹' + esc(p.price) + "</div>" +
-      '<ul class="pkg-perks">' + p.perks.map((k) => "<li>" + esc(k) + "</li>").join("") + "</ul>" +
-      '<button class="btn buy-btn" data-buy="' + esc(p.id) + '">Buy Now</button></div>').join("");
-    storeGrid.addEventListener("click", (e) => {
-      const b = e.target.closest("[data-buy]");
-      if (!b) return;
-      const pkg = D.store.packages.find((p) => p.id === b.dataset.buy);
-      if (pkg) openBuy(pkg);
-    });
-  }
-  const note = $("#storeNote");
-  if (note && D.store && D.store.note) note.textContent = D.store.note;
-  const help = $(".store-help");
-  if (help && !storeReady) help.innerHTML = help.innerHTML + ' <a href="#discord">→ Worker/API setup help chahiye?</a>';
-
-  /* ================= 12. STAFF ================= */
-  const staffGrid = $("#staffGrid");
-  const roleColor = {
-    "owner": "#fbbf24", "co-owner": "#fb923c", "admin": "#f87171",
-    "sr.mod": "#4ade80", "mod": "#22d3ee", "helper": "#a78bfa"
+  /* ------------------------------------------------------------------ */
+  /* Team + Apply card                                                  */
+  /* ------------------------------------------------------------------ */
+  const roleColors = {
+    owner: "#fbbf24",
+    "co-owner": "#fb923c",
+    admin: "#f87171",
+    "sr.mod": "#4ade80",
+    mod: "#22d3ee",
+    helper: "#a78bfa"
   };
-  function hexToRgb(h) {
-    const n = parseInt(h.slice(1), 16);
+
+  function roleColor(role) {
+    return roleColors[String(role || "").toLowerCase()] || "#22d3ee";
+  }
+  function hexToRgb(hex) {
+    const n = parseInt(hex.slice(1), 16);
     return (n >> 16) + "," + ((n >> 8) & 255) + "," + (n & 255);
   }
-  if (staffGrid && D.staff) {
-    staffGrid.innerHTML = D.staff.map((m, i) => {
-      const key = m.rank.toLowerCase();
-      const c = roleColor[key] || "#22d3ee";
+
+  const teamGrid = $("#teamGrid");
+  if (teamGrid) {
+    const members = CFG.team || [];
+    let html = members.map(function (m, i) {
+      const c = roleColor(m.role);
       const avatar = "https://mc-heads.net/avatar/" + encodeURIComponent(m.name) + "/128";
-      return '<div class="staff-card reveal" style="--c:' + c + ";transition-delay:" + (i * 70) + 'ms">' +
-        '<img class="staff-avatar" src="' + avatar + '" alt="' + esc(m.name) + '" loading="lazy" ' +
-        'onerror="this.onerror=null;this.src=\'https://mc-heads.net/avatar/Steve/128\'" />' +
-        '<div class="staff-name">' + esc(m.name) + "</div>" +
-        '<div class="staff-role" style="color:' + c + ";background:rgba(" + hexToRgb(c) + ",.12);border:1px solid rgba(" + hexToRgb(c) + ",.4)\">" +
-        esc(m.rank) + "</div></div>";
+      return (
+        '<div class="member-card" style="--c:' + c + '" data-reveal style="--rd:' + (i * 70) + 'ms">' +
+        '<img class="member-avatar" src="' + avatar + '" alt="' + esc(m.name) + '" loading="lazy" ' +
+        "onerror=\"this.onerror=null;this.src='https://mc-heads.net/avatar/Steve/128'\" />" +
+        '<div class="member-name">' + esc(m.name) + "</div>" +
+        '<span class="member-role" style="color:' + c + ";background:rgba(" + hexToRgb(c) + ",.12);border:1px solid rgba(" + hexToRgb(c) + ",.4)\">" +
+        esc(m.role) + "</span></div>"
+      );
+    }).join("");
+
+    // Show an application card while the team has open slots.
+    if (members.length < 6) {
+      html +=
+        '<a class="member-card apply-card" href="' + esc(server.discord || "#") + '" data-reveal style="--rd:' + (members.length * 70) + 'ms">' +
+        '<span class="feature-icon">＋</span>' +
+        "<p>Join the team — staff applications are open on Discord.</p>" +
+        "</a>";
+    }
+    teamGrid.innerHTML = html;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* News / Vote / Rules                                                */
+  /* ------------------------------------------------------------------ */
+  const newsList = $("#newsList");
+  if (newsList && CFG.news) {
+    newsList.innerHTML = CFG.news.map(function (n, i) {
+      return (
+        '<article class="news-row" data-reveal style="--rd:' + (i * 80) + 'ms">' +
+        '<div class="news-date">' + esc(n.date) + "</div>" +
+        '<div class="news-body">' +
+        '<span class="news-tag">' + esc(n.tag || "UPDATE") + "</span>" +
+        '<h3 class="news-title">' + esc(n.title) + "</h3>" +
+        '<p class="news-desc">' + esc(n.desc) + "</p>" +
+        "</div></article>"
+      );
     }).join("");
   }
 
-  /* ================= 13. NEWS / VOTE / RULES ================= */
-  const newsList = $("#newsList");
-  if (newsList && D.news) {
-    newsList.innerHTML = D.news.map((n, i) =>
-      '<div class="news-item reveal" style="transition-delay:' + (i * 80) + 'ms">' +
-      '<div class="news-date">' + esc(n.date) + "</div>" +
-      '<div class="news-body"><span class="news-tag">' + esc(n.tag || "UPDATE") + "</span>" +
-      '<div class="news-title">' + esc(n.title) + "</div>" +
-      '<p class="news-desc">' + esc(n.desc) + "</p></div></div>").join("");
-  }
   const voteList = $("#voteList");
-  if (voteList && D.vote) {
-    voteList.innerHTML = D.vote.map((v, i) =>
-      '<a class="vote-btn reveal" href="' + esc(v.url) + '" target="_blank" rel="noopener" style="transition-delay:' + (i * 90) + 'ms">' +
-      '<span>⭐ ' + esc(v.name) + "</span><span class='vote-arr'>→</span></a>").join("");
+  if (voteList && CFG.voteSites) {
+    voteList.innerHTML = CFG.voteSites.map(function (v, i) {
+      return (
+        '<a class="vote-link" href="' + esc(v.url) + '" target="_blank" rel="noopener" data-reveal style="--rd:' + (i * 90) + 'ms">' +
+        "<span>" + esc(v.name) + "</span><span class='arr'>→</span></a>"
+      );
+    }).join("");
   }
+
   const rulesList = $("#rulesList");
-  if (rulesList && D.rules) {
-    rulesList.innerHTML = D.rules.map((r, i) =>
-      '<div class="rule-item reveal" style="transition-delay:' + (i * 60) + 'ms">' +
-      '<span class="rule-num">' + (i + 1) + "</span><p>" + esc(r) + "</p></div>").join("");
+  if (rulesList && CFG.rules) {
+    rulesList.innerHTML = CFG.rules.map(function (r, i) {
+      return '<li class="rule" data-reveal style="--rd:' + (i * 60) + 'ms"><p>' + esc(r) + "</p></li>";
+    }).join("");
   }
-  const dsc = D.discord || {};
-  if (dsc.title && $("#discordTitle")) $("#discordTitle").textContent = dsc.title;
-  if (dsc.desc && $("#discordDesc")) $("#discordDesc").textContent = dsc.desc;
 
-  /* ================= 14. NAVBAR ================= */
-  const nav = $("#navbar");
-  window.addEventListener("scroll", () => nav && nav.classList.toggle("scrolled", window.scrollY > 30));
-  const ham = $("#hamburger"), navLinks = $("#navLinks");
-  if (ham) ham.addEventListener("click", () => { ham.classList.toggle("open"); navLinks.classList.toggle("open"); });
-  navLinks.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => { ham.classList.remove("open"); navLinks.classList.remove("open"); }));
+  /* ------------------------------------------------------------------ */
+  /* Reveal system                                                      */
+  /* ------------------------------------------------------------------ */
+  function revealTransform(kind) {
+    if (kind === "left") return { x: -46 };
+    if (kind === "right") return { x: 46 };
+    if (kind === "zoom") return { scale: 0.92 };
+    return { y: 30 };
+  }
 
-  /* ================= 15. SCROLL REVEAL ================= */
-  const revealObs = new IntersectionObserver((entries) => {
-    entries.forEach((en) => {
-      if (en.isIntersecting) {
-        en.target.classList.add("in");
-        if (en.target.querySelector("[data-count]")) {
-          const v = en.target.querySelector("[data-count]");
-          animateCount(v, parseFloat(v.dataset.count), v.dataset.suffix || "", 1400);
+  function initReveals() {
+    const targets = $$("[data-reveal]");
+    if (!targets.length) return;
+
+    if (hasGSAP && !reduceMotion) {
+      targets.forEach(function (el) {
+        const delay = parseFloat(el.style.getPropertyValue("--rd")) / 1000 || 0;
+        const from = revealTransform(el.dataset.reveal);
+        window.gsap.fromTo(el,
+          Object.assign({ opacity: 0 }, from),
+          {
+            opacity: 1, x: 0, y: 0, scale: 1,
+            duration: 0.9,
+            delay: delay,
+            ease: "power3.out",
+            scrollTrigger: { trigger: el, start: "top 86%", once: true }
+          });
+      });
+
+      // Parallax on the showcase backdrop.
+      const showcaseBg = $("#showcaseBg");
+      if (showcaseBg) {
+        window.gsap.to(showcaseBg, {
+          yPercent: 16,
+          ease: "none",
+          scrollTrigger: { trigger: "#world", start: "top bottom", end: "bottom top", scrub: true }
+        });
+      }
+      return;
+    }
+
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add("is-in");
+          io.unobserve(en.target);
         }
-        revealObs.unobserve(en.target);
+      });
+    }, { threshold: 0.16 });
+    targets.forEach(function (el) { io.observe(el); });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Hero particles (lightweight pixel field)                           */
+  /* ------------------------------------------------------------------ */
+  function initParticles() {
+    const canvas = $("#heroCanvas");
+    if (!canvas || !canvas.getContext || reduceMotion) return;
+    const ctx = canvas.getContext("2d");
+
+    let width, height, particles = [], running = true;
+
+    function resize() {
+      width = canvas.width = canvas.offsetWidth;
+      height = canvas.height = canvas.offsetHeight;
+      const count = Math.min(56, Math.max(20, Math.floor(width / 22)));
+      particles = [];
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          size: 1.5 + Math.random() * 3,
+          vy: 0.15 + Math.random() * 0.4,
+          vx: (Math.random() - 0.5) * 0.15,
+          alpha: 0.05 + Math.random() * 0.22,
+          color: Math.random() > 0.55 ? "255,255,255" : "34,211,238",
+          glow: Math.random() > 0.82
+        });
+      }
+    }
+
+    function frame() {
+      if (!running) return;
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(function (p) {
+        p.y -= p.vy;
+        p.x += p.vx + Math.sin((p.y + p.x) / 70) * 0.1;
+        if (p.y < -8) { p.y = height + 8; p.x = Math.random() * width; }
+        if (p.x < -8) p.x = width + 8;
+        if (p.x > width + 8) p.x = -8;
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = "rgba(" + p.color + ",1)";
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+        if (p.glow) {
+          ctx.globalAlpha = p.alpha * 0.5;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * 3.2, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(" + p.color + ",0.5)";
+          ctx.fill();
+        }
+      });
+      requestAnimationFrame(frame);
+    }
+
+    resize();
+    frame();
+    window.addEventListener("resize", resize);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Typewriter                                                         */
+  /* ------------------------------------------------------------------ */
+  function initTypewriter() {
+    const el = $("#heroType");
+    const lines = heroCfg.taglines || [];
+    if (!el || !lines.length) return;
+
+    let line = 0;
+    let pos = 0;
+    let deleting = false;
+
+    function step() {
+      const text = lines[line];
+      el.textContent = text.slice(0, pos);
+      let wait = deleting ? 32 : 60;
+      if (!deleting && pos === text.length) {
+        wait = 1800;
+        deleting = true;
+      } else if (deleting && pos === 0) {
+        deleting = false;
+        line = (line + 1) % lines.length;
+        wait = 380;
+      }
+      pos += deleting ? -1 : 1;
+      setTimeout(step, wait);
+    }
+    step();
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Hero logo tilt (fine pointers only)                                */
+  /* ------------------------------------------------------------------ */
+  function initHeroTilt() {
+    if (!heroLogoWrap || !window.matchMedia("(pointer:fine)").matches || reduceMotion) return;
+    const hero = $(".hero");
+    if (!hero) return;
+    let targetX = 0, targetY = 0, curX = 0, curY = 0, ticking = false;
+
+    hero.addEventListener("mousemove", function (e) {
+      const r = hero.getBoundingClientRect();
+      targetX = ((e.clientX - r.left) / r.width - 0.5) * 9;
+      targetY = ((e.clientY - r.top) / r.height - 0.5) * -9;
+      if (!ticking) {
+        ticking = true;
+        (function loop() {
+          curX += (targetX - curX) * 0.08;
+          curY += (targetY - curY) * 0.08;
+          heroLogoWrap.style.transform =
+            "rotateY(" + curX.toFixed(2) + "deg) rotateX(" + curY.toFixed(2) + "deg)";
+          if (Math.abs(targetX - curX) > 0.05 || Math.abs(targetY - curY) > 0.05) {
+            requestAnimationFrame(loop);
+          } else {
+            ticking = false;
+          }
+        })();
       }
     });
-  }, { threshold: .14 });
-  $$(".reveal").forEach((el) => revealObs.observe(el));
-
-  /* ================= 16. FEATURED PARALLAX ================= */
-  const featSec = $(".featured");
-  let pTick = false;
-  function parallax() {
-    if (!featSec || !fBg) return;
-    const r = featSec.getBoundingClientRect();
-    if (r.bottom < 0 || r.top > window.innerHeight) return;
-    const mid = (r.top + r.bottom) / 2 - window.innerHeight / 2;
-    fBg.style.transform = "translateY(" + (mid * -0.12).toFixed(1) + "px)";
-  }
-  window.addEventListener("scroll", () => {
-    if (!pTick) { pTick = true; requestAnimationFrame(() => { parallax(); pTick = false; }); }
-  }, { passive: true });
-  parallax();
-
-  /* ================= 17. HERO LOGO MOUSE TILT ================= */
-  const hero = $(".hero");
-  let tx = 0, ty = 0, cx = 0, cy = 0, tRaf = false;
-  if (hero && wrap && window.matchMedia("(pointer:fine)").matches) {
-    hero.addEventListener("mousemove", (e) => {
-      const r = hero.getBoundingClientRect();
-      tx = ((e.clientX - r.left) / r.width - .5) * 10;   // -5..5 deg
-      ty = ((e.clientY - r.top) / r.height - .5) * -10;
-      if (!tRaf) { tRaf = true; (function loop() { cx += (tx - cx) * .08; cy += (ty - cy) * .08; wrap.style.transform = "rotateY(" + cx + "deg) rotateX(" + cy + "deg)"; if (Math.abs(tx - cx) > .05 || Math.abs(ty - cy) > .05) requestAnimationFrame(loop); else tRaf = false; })(); }
-    });
-    hero.addEventListener("mouseleave", () => { tx = 0; ty = 0; });
+    hero.addEventListener("mouseleave", function () { targetX = 0; targetY = 0; });
   }
 
-  /* ================= 18. MODALS + COPY ================= */
-  function openModal(id) { const m = $("#" + id); if (m) { m.classList.add("show"); document.body.style.overflow = "hidden"; } }
-  function closeModal(id) { const m = $("#" + id); if (m) { m.classList.remove("show"); if (!$$(".modal.show").length) document.body.style.overflow = ""; } }
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") $$(".modal.show").forEach((m) => m.classList.remove("show")); });
+  /* ------------------------------------------------------------------ */
+  /* Navigation                                                         */
+  /* ------------------------------------------------------------------ */
+  function initNav() {
+    const nav = $("#nav");
+    const burger = $("#burger");
+    const links = $("#navLinks");
 
-  function toast(msg) {
-    let t = $(".toast");
-    if (!t) { t = document.createElement("div"); t.className = "toast"; document.body.appendChild(t); }
-    t.textContent = msg;
-    requestAnimationFrame(() => t.classList.add("show"));
-    clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 1800);
+    window.addEventListener("scroll", function () {
+      if (nav) nav.classList.toggle("is-scrolled", window.scrollY > 30);
+    }, { passive: true });
+
+    if (burger && links) {
+      burger.addEventListener("click", function () {
+        const open = links.classList.toggle("is-open");
+        burger.setAttribute("aria-expanded", String(open));
+      });
+      $$("a", links).forEach(function (a) {
+        a.addEventListener("click", function () {
+          links.classList.remove("is-open");
+          burger.setAttribute("aria-expanded", "false");
+        });
+      });
+    }
   }
-  function copyText(txt, msg) {
-    const done = () => toast(msg || "✅ Copied!");
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => fallbackCopy(txt, done));
-    else fallbackCopy(txt, done);
+
+  /* ------------------------------------------------------------------ */
+  /* Modals, copy & globals                                             */
+  /* ------------------------------------------------------------------ */
+  function toast(message) {
+    let node = $(".toast");
+    if (!node) {
+      node = document.createElement("div");
+      node.className = "toast";
+      document.body.appendChild(node);
+    }
+    node.textContent = message;
+    requestAnimationFrame(function () { node.classList.add("is-show"); });
+    clearTimeout(node._t);
+    node._t = setTimeout(function () { node.classList.remove("is-show"); }, 2000);
   }
-  function fallbackCopy(txt, done) {
-    const ta = document.createElement("textarea");
-    ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
-    document.body.appendChild(ta); ta.select();
-    try { document.execCommand("copy"); done(); } catch (e) {}
-    ta.remove();
+
+  function legacyCopy(text, done) {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.select();
+    try { document.execCommand("copy"); done(); } catch (err) {}
+    area.remove();
   }
-  function copyIP() { copyText(S.ip || "play.wattercraft.fun", "IP copied — ab Minecraft me paste karo!"); openJoin(); }
+
+  function copyText(text, message) {
+    const done = function () { toast(message || "Copied to clipboard."); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(function () { legacyCopy(text, done); });
+    } else {
+      legacyCopy(text, done);
+    }
+  }
+
   function openJoin() { openModal("joinModal"); }
   function closeJoin() { closeModal("joinModal"); }
   function closeBuy() { closeModal("buyModal"); }
+  function copyIP() {
+    copyText(server.ip || "play.wattercraft.fun", "Server IP copied. Paste it in Minecraft!");
+    openJoin();
+  }
 
-  /* expose globals for inline onclick */
-  window.copyIP = copyIP; window.openJoin = openJoin;
-  window.closeJoin = closeJoin; window.closeBuy = closeBuy;
+  $$(".modal").forEach(function (m) {
+    m.addEventListener("click", function (e) {
+      if (e.target === m) m.classList.remove("is-open");
+    });
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      $$(".modal.is-open").forEach(function (m) { m.classList.remove("is-open"); });
+      document.body.style.overflow = "";
+    }
+  });
+
+  // Exposed for inline handlers in index.html.
+  window.copyIP = copyIP;
+  window.openJoin = openJoin;
+  window.closeJoin = closeJoin;
+  window.closeBuy = closeBuy;
+
+  /* ------------------------------------------------------------------ */
+  /* Boot                                                               */
+  /* ------------------------------------------------------------------ */
+  function startHeroSequence() {
+    initTypewriter();
+    initHeroTilt();
+  }
+
+  initNav();
+  initParticles();
+  observeCounters();
+  initReveals();
 })();
