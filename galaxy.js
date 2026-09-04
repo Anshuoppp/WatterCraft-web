@@ -26,7 +26,8 @@ css.textContent =
 "#wcBg{position:fixed;inset:0;z-index:-2;pointer-events:none;background:#04070f center/cover no-repeat}" +
 "#wcBg::after{content:'';position:absolute;inset:0;background:linear-gradient(rgba(4,7,15,.42),rgba(4,7,15,.78) 75%,rgba(2,4,10,.92))}" +
 "#wcStars{position:fixed;inset:0;z-index:-1;pointer-events:none}" +
-".hero-bg{background:transparent!important;background-image:none!important}";
+".hero-bg{display:none!important}" +
+".hero{background:transparent!important}";
 (document.head || document.documentElement).appendChild(css);
 
 var pf = document.getElementById("pixelField");
