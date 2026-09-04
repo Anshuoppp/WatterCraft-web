@@ -477,23 +477,24 @@ function renderUpdates() {
    HOME — compact "Latest Updates" section
    ============================================================ */
 function renderHomeLatest() {
-  if (!$("#wcHomeLatest") && view && UPDATES.length) {
-    var top = UPDATES.slice(0, 3).map(function (u) {
-      var col = (CAT_COLORS[u.cat] || CAT_COLORS.announcement);
-      return '<a class="wc-hu" href="#/updates" style="animation:wcIn .5s ease both">' +
-        '<span class="ic">' + u.icon + "</span>" +
-        "<span><span style=\"color:" + col[0] + ';font-size:.66rem;font-weight:800;letter-spacing:1.2px\">' + esc(u.tag) + "</span>" +
-        "<b>" + esc(u.title) + "</b><p>" + esc(u.summary || "") + "</p>" +
-        "<small>" + uDate(u.date) + " · Read more →</small></span></a>";
-    }).join("");
-    view.insertAdjacentHTML("beforeend",
-      '<div class="container" id="wcHomeLatest"><section class="section">' +
-      header("News", "Latest ^Updates^", "Fresh from the server.") +
-      '<div style="display:grid;gap:14px">' + top +
-      '<div style="text-align:center;margin-top:10px"><a class="btn btn-ghost" href="#/updates">VIEW ALL UPDATES →</a></div>' +
-      "</div></section></div>");
-  }
+if (!$("#wcHomeLatest") && view && UPDATES.length) {
+var top = UPDATES.slice(0, 3).map(function (u) {
+var col = (CAT_COLORS[u.cat] || CAT_COLORS.announcement);
+return '<a class="wc-hu" href="#/updates" style="animation:wcIn .5s ease both">' +
+'<span class="ic">' + u.icon + '</span>' +
+'<span><span style="color:' + col[0] + ';font-size:.66rem;font-weight:800;letter-spacing:1.2px">' + esc(u.tag) + '</span>' +
+'<b>' + esc(u.title) + '</b><p>' + esc(u.summary || '') + '</p>' +
+'<small>' + uDate(u.date) + ' - Read more</small></span></a>';
+}).join('');
+view.insertAdjacentHTML('beforeend',
+'<div class="container" id="wcHomeLatest"><section class="section">' +
+header('News', 'Latest ^Updates^', 'Fresh from the server.') +
+'<div style="display:grid;gap:14px">' + top +
+'<div style="text-align:center;margin-top:10px"><a class="btn btn-ghost" href="#/updates">VIEW ALL UPDATES -</a></div>' +
+'</div></section></div>');
 }
+}
+
 
 /* ============================================================
    ROUTING — runs last, so it wins on every navigation
