@@ -176,8 +176,9 @@ $$(".cx-guide", g).forEach(function (c) { c.style.display = (!q || c.textContent
 $$("#cxPeriods .cx-tab").forEach(function (b) { b.addEventListener("click", function () { $$("#cxPeriods .cx-tab").forEach(function (x) { x.classList.remove("on"); }); b.classList.add("on"); }); });
 $$("#cxCats .cx-chip").forEach(function (b) { b.addEventListener("click", function () { $$("#cxCats .cx-chip").forEach(function (x) { x.classList.remove("on"); }); b.classList.add("on"); }); });
 }
-function cxBoot() { if (cxKey()) cxRender(); }
+function cxBoot() {
 window.addEventListener("hashchange", cxRender);
+if (cxKey()) cxRender();
+}
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", cxBoot);
 else cxBoot();
-})();
