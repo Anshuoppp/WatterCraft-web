@@ -292,15 +292,10 @@ afterRender();
 }
 function afterRender() {
 loadBg(); bindView(); initReveal(); livePlayers();
-}
-function loadBg() {
-var el = $(".hero-bg"); if (!el) return;
-var url = el.getAttribute("data-bg");
-if (!url) { el.style.background = "radial-gradient(1000px 600px at 75% 20%, rgba(34,211,238,.14), transparent 60%), radial-gradient(800px 500px at 10% 80%, rgba(37,99,235,.16), transparent 55%), var(--bg-2)"; return; }
-var img = new Image();
-img.onload = function () { el.style.backgroundImage = "url('" + url + "')"; };
-img.onerror = function () { el.style.background = "radial-gradient(1000px 600px at 75% 20%, rgba(34,211,238,.14), transparent 60%), radial-gradient(800px 500px at 10% 80%, rgba(37,99,235,.16), transparent 55%), var(--bg-2)"; };
-img.src = url;
+var hb = document.querySelector(".hero-bg");
+if (hb) hb.style.display = "none";
+var hd = document.querySelector(".hero");
+if (hd) hd.style.background = "transparent";
 }
 function livePlayers() {
 var cell = $("#livePlayers"); if (!cell) return;
