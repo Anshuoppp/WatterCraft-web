@@ -10,16 +10,17 @@
     var CONF = {
       /* First image that loads wins. Order = preference.
          Upload hub-night.png & hub-day.png into assets/. */
-      images: [
-        /* Visitor ke LOCAL time se decide: 6AM–6PM day, 6PM–6AM night */
-        var h = new Date().getHours();
-        var day = h >= 6 && h < 18;
-        return day
-     ? ["assets/hub-day.png", "assets/hub-day.jpg",
-          "assets/hub-night.png", "assets/hub-night.jpg"]
-     : ["assets/hub-night.png", "assets/hub-night.jpg",
-        "assets/hub-day.png", "assets/hub-day.jpg"];
-      ],
+              images: (function () {
+          /* visitor ke LOCAL time se decide: 6AM-6PM day, 6PM-6AM night */
+          var h = new Date().getHours();
+          var day = h >= 6 && h < 18;
+          return day
+          ? ["assets/hub-day.png", "assets/hub-day.jpg",
+             "assets/hub-night.png", "assets/hub-night.jpg"]
+          : ["assets/hub-night.png", "assets/hub-night.jpg",
+             "assets/hub-day.png", "assets/hub-day.jpg"];
+        })(),
+
       overlay: "linear-gradient(rgba(4,7,15,.42), rgba(4,7,15,.78) 75%, rgba(2,4,10,.92))",
       desktopStars: 150,
       mobileStars: 50,
