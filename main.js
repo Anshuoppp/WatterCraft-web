@@ -291,11 +291,13 @@ window.scrollTo(0, 0);
 afterRender();
 }
 function afterRender() {
-loadBg(); bindView(); initReveal(); livePlayers();
+loadBg(); bindview(); initReveal(); livePlayers();
 var hb = document.querySelector(".hero-bg");
 if (hb) hb.style.display = "none";
 var hd = document.querySelector(".hero");
-if (hd) hd.style.background = "transparent";
+if (hd) { hd.style.background = "transparent"; hd.style.paddingTop = "130px"; }
+var hv = document.querySelector(".hero-veil");
+if (hv) hv.style.display = "none";
 }
 function livePlayers() {
 var cell = $("#livePlayers"); if (!cell) return;
