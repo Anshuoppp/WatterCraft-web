@@ -21,7 +21,7 @@
       shootMin: 5000,
       shootMax: 12000
     };
-    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var reduce = false;
     var mobile = window.innerWidth < 720;
     var body = document.body;
 
