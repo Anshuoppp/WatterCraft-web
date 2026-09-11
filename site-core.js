@@ -1,7 +1,8 @@
-/* WatterCraft V2.5 - Site Core v3 (SAFE: never overwrites engine pages) */
+/* WatterCraft V2.5 - Site Core v4 (reveal fix + hero anim, SAFE) */
 (function () {
 "use strict";
 function $(s, r) { return (r || document).querySelector(s); }
+function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
 function esc(s) {
 return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
 return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -19,8 +20,10 @@ st.textContent = [
 "#wcHeroAnim .wc-chip:hover{transform:translateY(-3px);border-color:rgba(34,211,238,.7);box-shadow:0 10px 26px rgba(34,211,238,.2)}",
 "#wcHeroAnim .wc-chip.hot{border-color:rgba(34,211,238,.55);background:rgba(14,116,144,.3)}",
 "@keyframes wcBlink{0%,49%{opacity:1}50%,100%{opacity:0}}",
-"@keyframes wcFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}"
+"@keyframes wcFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}",
 "[data-reveal]{opacity:1!important;transform:none!important;transition:none!important}",
+"html.js [data-reveal]{opacity:1!important;transform:none!important}",
+"html.js [data-reveal].in{opacity:1!important;transform:none!important}"
 ].join("");
 (document.head || document.documentElement).appendChild(st);
 }
@@ -29,6 +32,12 @@ var h = (location.hash || "").replace(/^#\/?/, "");
 return h.split("/")[0].split("?")[0].toLowerCase();
 }
 function isHome() { var s = seg(); return s === "" || s === "home"; }
+/* ---------- force-reveal: content hamesha visible ---------- */
+function nudgeReveal() {
+$$("#view [data-reveal]").forEach(function (el) {
+if (!el.classList.contains("in")) el.classList.add("in");
+});
+}
 /* ---------- hero: typewriter + quick chips ---------- */
 var PHRASES = [
 "Islands, skills, quests, pets, minions & dungeons - all in one server.",
@@ -96,12 +105,12 @@ discord: { k: "COMMUNITY", t: "Join our Discord", s: "Giveaways, updates and ins
 rules: { k: "SERVER POLICY", t: "Server Rules", s: "No cheating, no griefing, respect everyone. Full list loads with the main engine." }
 };
 function tick() {
+nudgeReveal();
 var view = $("#view");
 if (!view) return;
 if (isHome()) { injectHero(); return; }
 var s = seg();
 if (s === "wiki" || s === "guides" || s === "leaderboards" || s === "updates") return;
-/* GOLDEN RULE: if the main engine already rendered ANYTHING, never touch it */
 if (String(view.innerHTML).trim() !== "") return;
 var f = FALLBACK[s];
 var html;
