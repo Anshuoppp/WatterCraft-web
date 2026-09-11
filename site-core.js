@@ -20,6 +20,7 @@ st.textContent = [
 "#wcHeroAnim .wc-chip.hot{border-color:rgba(34,211,238,.55);background:rgba(14,116,144,.3)}",
 "@keyframes wcBlink{0%,49%{opacity:1}50%,100%{opacity:0}}",
 "@keyframes wcFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}"
+"[data-reveal]{opacity:1!important;transform:none!important;transition:none!important}",
 ].join("");
 (document.head || document.documentElement).appendChild(st);
 }
