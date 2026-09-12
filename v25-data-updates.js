@@ -25,7 +25,7 @@ window.WCV.updates = [
    icon: "🤖", 
    cat: "new", 
    tag: "NEW",
-   title: "Official WatterBot Launched - Auto Updates & Linking",
+   title: "Official WatterBot Launched",
    date: "2026-09-12", 
    author: "Team WatterCraft",
    status: "Live", 
