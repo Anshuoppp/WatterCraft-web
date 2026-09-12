@@ -445,3 +445,19 @@ table { max-width: 100%; }
   .hero { min-height: auto; }
   .hero-inner { padding-bottom: 32px; }
 }
+/* Icon sizing */
+.icon { width: 20px; height: 20px; flex-shrink: 0; }
+.nav-links .icon { width: 15px; height: 15px; margin-right: 5px; display: inline-block; vertical-align: -2px; }
+.copy-ip .icon { width: 14px; height: 14px; }
+.search-trigger .icon { width: 16px; height: 16px; }
+.feature-icon .icon { width: 26px; height: 26px; }
+.path-node .icon { width: 18px; height: 18px; color: var(--cyan); }
+.area-head .icon { width: 30px; height: 30px; color: var(--cyan); }
+.store-cat-head .icon { width: 24px; height: 24px; color: var(--cyan); }
+.perk-list .icon { width: 13px; height: 13px; margin-top: 4px; color: var(--green); }
+.staff-open .icon { width: 20px; height: 20px; }
+.rule-card .icon { width: 30px; height: 30px; color: var(--cyan); flex-shrink: 0; }
+.support-card .icon { width: 28px; height: 28px; color: var(--cyan); margin-bottom: 12px; }
+.empty-state .icon { width: 44px; height: 44px; margin: 0 auto 14px; opacity: 0.4; }
+.vote-btn .icon { width: 30px; height: 30px; color: var(--amber); }
+.search-item .icon { width: 18px; height: 18px; color: var(--cyan); }
