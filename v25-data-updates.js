@@ -33,7 +33,7 @@ window.WCV.updates = [
    summary: "WatterBot is now live with automatic website update notifications, Discord-Minecraft account linking, and role synchronization!",
    body: [
      "WatterBot now automatically detects website updates and posts them to Discord. No manual intervention needed!",
-     "Use /setup-link to link your Discord with Minecraft account. Get automatic role sync based on your in-game rank. Link: 1 ₹ = 10 Gems conversion."
+     "Use /link to link your Discord with Minecraft account. Get automatic role sync based on your in-game rank."
    ],
    affected: ["Discord", "Bot", "Website", "Account Linking"],
    tags: ["Bot", "Automation", "Discord", "Linking"]
