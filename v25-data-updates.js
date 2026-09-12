@@ -20,6 +20,26 @@ window.WCV.updateFilters = [
 
 window.WCV.updates = [
   {
+   id: "update-007", 
+   num: "#007",
+   icon: "⚔️", 
+   cat: "new", 
+   tag: "NEW",
+   title: "Slayer System Added - Boss Battles & Rewards",
+   date: "2026-09-12", 
+   author: "Team WatterCraft",
+   status: "Live", 
+   statusColor: "#4ade80",
+   summary: "Introducing Slayer - fight powerful boss mobs, earn exclusive loot, and level up your combat skills!",
+   body: [
+     "Slayer bosses are now available! Hunt down powerful enemies and earn unique rewards.",
+     "Each Slayer tier offers progressively harder challenges with better loot including rare weapons, armor, and materials.",
+     "Track your Slayer progress with dedicated stats and leaderboards. Compete with other players!"
+   ],
+   affected: ["Combat", "Bosses", "Loot", "Progression"],
+   tags: ["Slayer", "Boss", "Combat", "PvE", "Rewards"]
+  },
+  {
    id: "update-006", 
    num: "#006",
    icon: "🤖", 
