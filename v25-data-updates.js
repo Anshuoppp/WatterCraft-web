@@ -20,6 +20,25 @@ window.WCV.updateFilters = [
 
 window.WCV.updates = [
   {
+   id: "update-006", 
+   num: "#006",
+   icon: "🤖", 
+   cat: "new", 
+   tag: "NEW",
+   title: "Official WatterBot Launched - Auto Updates & Linking",
+   date: "2026-09-12", 
+   author: "Team WatterCraft",
+   status: "Live", 
+   statusColor: "#4ade80",
+   summary: "WatterBot is now live with automatic website update notifications, Discord-Minecraft account linking, and role synchronization!",
+   body: [
+     "WatterBot now automatically detects website updates and posts them to Discord. No manual intervention needed!",
+     "Use /setup-link to link your Discord with Minecraft account. Get automatic role sync based on your in-game rank. Link: 1 ₹ = 10 Gems conversion."
+   ],
+   affected: ["Discord", "Bot", "Website", "Account Linking"],
+   tags: ["Bot", "Automation", "Discord", "Linking"]
+  },
+  {
     id: "update-005", num: "#005",
     icon: "🌐", cat: "website", tag: "WEBSITE",
     title: "Website V2.5 — Galaxy & Wiki Launch",
